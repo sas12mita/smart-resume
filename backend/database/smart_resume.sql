@@ -1,10 +1,6 @@
--- Create database
 CREATE DATABASE IF NOT EXISTS smartresume;
 USE smartresume;
 
--------------------------------------------------------
--- USERS TABLE
--------------------------------------------------------
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fullname VARCHAR(100) NOT NULL,
@@ -13,22 +9,16 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--------------------------------------------------------
--- BIO TABLE
--------------------------------------------------------
 CREATE TABLE bio (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     phone VARCHAR(30),
     address VARCHAR(255),
-    social_media JSON
+    social_media JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- EDUCATION TABLE
--------------------------------------------------------
 CREATE TABLE education (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -40,9 +30,6 @@ CREATE TABLE education (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- EXPERIENCE TABLE
--------------------------------------------------------
 CREATE TABLE experience (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -55,21 +42,15 @@ CREATE TABLE experience (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- SKILLS TABLE
--------------------------------------------------------
 CREATE TABLE skills (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     skill_name VARCHAR(100) NOT NULL,
-    skill_level VARCHAR(50), -- Beginner, Intermediate, Expert
+    skill_level VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- PROJECTS TABLE
--------------------------------------------------------
 CREATE TABLE projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -80,21 +61,15 @@ CREATE TABLE projects (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- LANGUAGES TABLE
--------------------------------------------------------
 CREATE TABLE languages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     language_name VARCHAR(100) NOT NULL,
-    proficiency VARCHAR(50), -- basic / intermediate / fluent / native
+    proficiency VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- HOBBIES TABLE
--------------------------------------------------------
 CREATE TABLE hobbies (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -103,9 +78,6 @@ CREATE TABLE hobbies (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--------------------------------------------------------
--- TRAINING / CERTIFICATIONS TABLE
--------------------------------------------------------
 CREATE TABLE training (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
