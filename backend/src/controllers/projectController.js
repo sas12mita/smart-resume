@@ -31,6 +31,6 @@ export const updateProject = (req, res) => {
 export const deleteProject = (req, res) => {
   Project.delete(req.params.id, (err) => {
     if (err) return res.status(500).json(err);
-    res.json({ message: "Project deleted" });
+    res.json({ message: "Project deleted successfully" });
   });
 };
