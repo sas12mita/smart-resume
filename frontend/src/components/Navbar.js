@@ -1,12 +1,21 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const goToDashboard = () => {
+    navigate("/user/dashboard");
+  };
+
   return (
     <nav style={styles.nav}>
       <h2>Jobseeker</h2>
       <div>
         <button style={styles.btn}>Log in</button>
-        <button style={styles.start}>Get Started</button>
+        <button style={styles.start} onClick={goToDashboard}>
+          Get Started
+        </button>
       </div>
     </nav>
   );

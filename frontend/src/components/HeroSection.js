@@ -1,6 +1,11 @@
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
+    const navigate = useNavigate();
+
+  const goToDashboard = () => {
+    navigate("/user/dashboard");
+  }
   return (
     <div style={styles.container}>
       <h1>
@@ -11,7 +16,7 @@ const HeroSection = () => {
         letters to job listings and keeping track of your applications.
       </p>
 
-      <button style={styles.button}>Get Started</button>
+      <button style={styles.button} onClick={goToDashboard}>Get Started</button>
     </div>
   );
 };
