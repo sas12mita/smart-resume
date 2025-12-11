@@ -1,13 +1,11 @@
-import Navbar from "../components/navbar";
+import React from "react";
 import HeroSection from "../components/HeroSection";
-
+import Navbar from "../components/Navbar";
 function Home() {
-  return (
-    <>
-      <Navbar />
-      <HeroSection />
-    </>
-  );
-}
+  return <>gi
+    <Navbar />
+    <HeroSection />
 
+  </>;
+}
 export default Home;
