@@ -73,7 +73,7 @@ const API_URL = process.env.REACT_APP_API_URL;
         setIsSubmitting(true);
 
         console.log(API_URL)
-        const secureLoginEndpoint = `${API_URL}/admin/auth/login`; 
+        const secureLoginEndpoint = `${API_URL}/api/admin/login`; 
 
         try {
             const response = await axios.post(secureLoginEndpoint, {

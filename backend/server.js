@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import db from "./src/config/db.js";
 
-import userRoutes from "./src/routes/userRoutes.js";
+import userRoute from "./src/routes/userRoute.js";
 import bioRoutes from "./src/routes/bioRoutes.js";
 import educationRoutes from "./src/routes/educationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect Routes
-app.use("/api/users", userRoutes);
+app.use("/api/users", userRoute);
 app.use("/api/bio", bioRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/admin", adminRoutes);
