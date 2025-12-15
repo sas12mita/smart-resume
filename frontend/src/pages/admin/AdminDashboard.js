@@ -65,7 +65,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
     const API_URL = process.env.REACT_APP_API_URL;
-    axios.get("${API_URL}/api/admin/dashboard", {
+    axios.get(`${API_URL}/api/admin/dashboard`, {
         headers: { Authorization: "Bearer " + token }
       })
       .then((res) => setMsg(res.data.msg))
