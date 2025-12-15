@@ -1,4 +1,4 @@
-import { Education } from "../models/education.model.js";
+import { Education } from "../models/educationModel.js";
 
 export const addEducation = async (req, res) => {
   try {

@@ -1,10 +1,9 @@
 import express from "express";
-import { addEducation, getEducation } from "../controllers/education.controller.js";
-import auth from "../middleware/auth.js";
+import { addEducation, getEducation } from "../controllers/educationController.js";
 
 const router = express.Router();
 
-router.post("/", auth, addEducation);
-router.get("/", auth, getEducation);
+router.post("/", addEducation);
+router.get("/", getEducation);
 
 export default router;

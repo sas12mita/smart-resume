@@ -74,12 +74,13 @@ const API_URL = process.env.REACT_APP_API_URL;
 
         console.log(API_URL)
         const secureLoginEndpoint = `${API_URL}/api/admin/login`; 
-
+        console.log(secureLoginEndpoint)
         try {
             const response = await axios.post(secureLoginEndpoint, {
                 email,
                 password,
             });
+
 
             const token = response.data.token;
             if (token) {

@@ -1,10 +1,8 @@
 import express from "express";
-import { createBio, getBio } from "../controllers/bio.controller.js";
-import auth from "../middleware/auth.js";
-
+import { createBio, getBio } from "../controllers/bioController.js";
 const router = express.Router();
 
-router.post("/", auth, createBio);
-router.get("/", auth, getBio);
+router.post("/",createBio);
+router.get("/",getBio);
 
 export default router;

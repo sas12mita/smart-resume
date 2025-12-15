@@ -1,4 +1,4 @@
-import { Bio } from "../models/bio.model.js";
+import { Bio } from "../models/bioModel.js";
 
 export const createBio = async (req, res) => {
   try {

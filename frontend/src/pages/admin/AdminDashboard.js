@@ -48,8 +48,8 @@ const layoutStyles = {
 
 // Admin navigation items
 const adminNavItems = [
-  { name: "Dashboard", link: "/admin" }, 
-  { name: "Users", link: "/admin/users" }, 
+  { name: "Dashboard", link: "/admin" },
+  { name: "Users", link: "/admin/users" },
   { name: "Settings", link: "/admin/settings" }
 ];
 
@@ -64,9 +64,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
-
-    axios
-      .get("/api/admin/dashboard", {
+    const API_URL = process.env.REACT_APP_API_URL;
+    axios.get("${API_URL}/api/admin/dashboard", {
         headers: { Authorization: "Bearer " + token }
       })
       .then((res) => setMsg(res.data.msg))
@@ -82,9 +81,9 @@ export default function AdminDashboard() {
           {adminNavItems.map((item) => (
             <div
               key={item.name}
-              style={{ 
-                ...layoutStyles.sidebarItem, 
-                backgroundColor: window.location.pathname.includes(item.link) ? '#495057' : 'transparent' 
+              style={{
+                ...layoutStyles.sidebarItem,
+                backgroundColor: window.location.pathname.includes(item.link) ? '#495057' : 'transparent'
               }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#343a40'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = window.location.pathname.includes(item.link) ? '#495057' : 'transparent'}

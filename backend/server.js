@@ -6,7 +6,7 @@ import db from "./src/config/db.js";
 import userRoute from "./src/routes/userRoute.js";
 import bioRoutes from "./src/routes/bioRoutes.js";
 import educationRoutes from "./src/routes/educationRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
+import adminRoutes from "./src/routes/adminRoutes.js"
 
 
 dotenv.config();
