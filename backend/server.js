@@ -7,6 +7,7 @@ import userRoute from "./src/routes/userRoute.js";
 import bioRoutes from "./src/routes/bioRoutes.js";
 import educationRoutes from "./src/routes/educationRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js"
+import resumeTemplateRoutes from "./src/routes/resumeTemplateRoutes.js"
 
 
 dotenv.config();
@@ -21,6 +22,11 @@ app.use("/api/users", userRoute);
 app.use("/api/bio", bioRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/admin", adminRoutes);
+
+
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+app.use("/api/admin/resumetemplates", resumeTemplateRoutes);
 
 // Server Start
 const PORT = process.env.PORT || 5000;

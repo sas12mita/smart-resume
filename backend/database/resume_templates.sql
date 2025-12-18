@@ -1,0 +1,8 @@
+CREATE TABLE resume_templates (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  template_key VARCHAR(50) NOT NULL,
+  title VARCHAR(100),
+  thumbnail VARCHAR(255),
+  status TINYINT DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

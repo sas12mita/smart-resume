@@ -17,10 +17,16 @@ function AppRoutes() {
       <Route path="/user/dashboard" element={<UserDashboard />}>
         <Route index element={<DashboardContent />} />   {/* 👈 DEFAULT */}
         <Route path="resume/template" element={<TemplateSelect />} />
-        <Route path="setting" element={<Setting/>} />
-        <Route path="coverletter" element={<CoverLetter/>} />
+        <Route path="setting" element={<Setting />} />
+        <Route path="coverletter" element={<CoverLetter />} />
       </Route>
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />}>
+        {/* Nested routes inside AdminDashboard */}
+        <Route index element={<TemplateList />} />       {/* default */}
+        <Route path="templates/list" element={<TemplateList />} />
+        <Route path="templates/create" element={<TemplateCreate />} />
+        <Route path="templates/edit/:id" element={<TemplateEdit />} />
+      </Route>
       <Route path="/admin/login" element={<AdminLogin />} />
     </Routes>
   );
