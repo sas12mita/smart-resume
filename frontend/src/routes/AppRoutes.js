@@ -2,13 +2,20 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home from "../pages/Home";
-import UserDashboard from "../pages/user/UserDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminDashboardContent from "../pages/admin/AdminDashboardContent";
+import AdminTemplateCreate from "../pages/admin/resumeTemplate/AdminTemplateCreate";
+import AdminTemplateList from "../pages/admin/resumeTemplate/AdminTemplateList";
+import AdminTemplateEdit from "../pages/admin/resumeTemplate/AdminTemplateEdit"
 import AdminLogin from "../pages/admin/AdminLogin";
+
+
+import UserDashboard from "../pages/user/UserDashboard";
 import DashboardContent from "../pages/user/DashboardContent";
 import TemplateSelect from "../pages/user/resume/TemplateSelect";
 import Setting from "../pages/user/setting/Setting";
 import CoverLetter from "../pages/user/coverletter/CoverLetter";
+
 
 function AppRoutes() {
   return (
@@ -22,10 +29,10 @@ function AppRoutes() {
       </Route>
       <Route path="/admin/dashboard" element={<AdminDashboard />}>
         {/* Nested routes inside AdminDashboard */}
-        <Route index element={<TemplateList />} />       {/* default */}
-        <Route path="templates/list" element={<TemplateList />} />
-        <Route path="templates/create" element={<TemplateCreate />} />
-        <Route path="templates/edit/:id" element={<TemplateEdit />} />
+        <Route index element={<AdminDashboardContent />} />       {/* default */}
+        <Route path="templates/list" element={<AdminTemplateList />} />
+        <Route path="templates/create" element={<AdminTemplateCreate />} />
+        <Route path="templates/edit/:id" element={<AdminTemplateEdit />} />
       </Route>
       <Route path="/admin/login" element={<AdminLogin />} />
     </Routes>

@@ -2,6 +2,9 @@ import express from "express"
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./src/config/db.js";
+import path from "path";
+
+express.urlencoded({ extended: true })
 
 import userRoute from "./src/routes/userRoute.js";
 import bioRoutes from "./src/routes/bioRoutes.js";
@@ -24,7 +27,7 @@ app.use("/api/education", educationRoutes);
 app.use("/api/admin", adminRoutes);
 
 
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/uploads/", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api/admin/resumetemplates", resumeTemplateRoutes);
 

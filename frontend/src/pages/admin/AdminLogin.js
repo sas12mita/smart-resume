@@ -81,8 +81,9 @@ const API_URL = process.env.REACT_APP_API_URL;
                 password,
             });
 
-
+            console.log("hello")
             const token = response.data.token;
+
             if (token) {
                 localStorage.setItem("adminToken", token);
                 window.location.href = "/admin/dashboard"; 

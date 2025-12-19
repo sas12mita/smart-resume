@@ -1,4 +1,4 @@
-import { db } from "../db.js";
+import db from "../config/db.js";
 
 // GET all templates
 export const getResumeTemplates = (req, res) => {
@@ -24,7 +24,8 @@ export const getResumeTemplate = (req, res) => {
 export const createResumeTemplate = (req, res) => {
   const { template_key, title, status } = req.body;
   const thumbnail = req.file ? `/uploads/templates/${req.file.filename}` : null;
-
+  console.log("BODY:", req.body);
+  console.log("FILE:", req.file);
   const q = `
     INSERT INTO resume_templates (template_key, title, thumbnail, status)
     VALUES (?,?,?,?)

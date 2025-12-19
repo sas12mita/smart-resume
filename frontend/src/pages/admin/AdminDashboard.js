@@ -1,60 +1,25 @@
-// AdminDashboard.jsx (Standalone with Layout and Styles)
-
 import { useEffect, useState } from "react";
+import { Link, Outlet } from "react-router-dom";
 import axios from "axios";
 
-const layoutStyles = {
-  container: {
-    display: "flex",
-    minHeight: "100vh",
-    backgroundColor: "#f4f7f9", // Light background for content
-  },
-  sidebar: {
-    width: "250px",
-    backgroundColor: "#212529", // Black/Dark background
-    color: "white",
-    padding: "20px 0",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  sidebarItem: {
-    width: "80%",
-    padding: "10px",
-    margin: "5px 0",
-    borderRadius: "5px",
-    cursor: "pointer",
-    textAlign: "center",
-    transition: "background-color 0.2s",
-  },
-  mainContent: {
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
-  },
-  header: {
-    backgroundColor: "white",
-    padding: "15px 30px",
-    borderBottom: "1px solid #e9ecef",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  contentArea: {
-    padding: "30px",
-    flexGrow: 1,
-  },
+const linkStyle = {
+  display: "block",
+  color: "#ced4da",
+  textDecoration: "none",
+  padding: "12px 15px",
+  borderRadius: "4px",
+  marginBottom: "5px",
+  transition: "all 0.3s",
 };
 
-// Admin navigation items
-const adminNavItems = [
-  { name: "Dashboard", link: "/admin" },
-  { name: "Users", link: "/admin/users" },
-  { name: "Settings", link: "/admin/settings" }
-];
-
 export default function AdminDashboard() {
-  const [msg, setMsg] = useState("Loading protected admin data...");
+  const [adminData, setAdminData] = useState({
+    name: "Admin User",
+    status: "Admin",
+  });
+  const [loading, setLoading] = useState(true);
+  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+
   const title = "Admin Dashboard";
 
   const handleLogout = () => {
@@ -64,65 +29,113 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
-    const API_URL = process.env.REACT_APP_API_URL;
-    axios.get(`${API_URL}/api/admin/dashboard`, {
-        headers: { Authorization: "Bearer " + token }
-      })
-      .then((res) => setMsg(res.data.msg))
-      .catch(() => handleLogout()); // Redirect on authentication failure
+    if (token) {
+      const API_URL = process.env.REACT_APP_API_URL || "";
+      axios
+        .get(`${API_URL}/api/admin/dashboard`, {
+          headers: { Authorization: "Bearer " + token },
+        })
+        .then((res) => setAdminData(res.data))
+        .catch(() => handleLogout());
+    }
+    setLoading(false);
   }, []);
 
-  return (
-    <div style={layoutStyles.container}>
-      {/* 1. Black Sidebar */}
-      <div style={layoutStyles.sidebar}>
-        <h2 style={{ marginBottom: "30px", color: "#6c757d" }}>ADMIN PANEL</h2>
-        <div style={{ width: '100%' }}>
-          {adminNavItems.map((item) => (
-            <div
-              key={item.name}
-              style={{
-                ...layoutStyles.sidebarItem,
-                backgroundColor: window.location.pathname.includes(item.link) ? '#495057' : 'transparent'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#343a40'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = window.location.pathname.includes(item.link) ? '#495057' : 'transparent'}
-              onClick={() => (window.location.href = item.link)}
-            >
-              {item.name}
-            </div>
-          ))}
-        </div>
-      </div>
+  if (loading) return <p>Loading...</p>;
 
-      {/* 2. Main Content Area */}
-      <div style={layoutStyles.mainContent}>
-        {/* Header */}
-        <div style={layoutStyles.header}>
-          <h1 style={{ margin: 0, fontSize: "1.5rem" }}>{title}</h1>
+  return (
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f4f7f9" }}>
+      {/* SIDEBAR */}
+      <aside
+        style={{
+          width: "250px",
+          backgroundColor: "#212529",
+          color: "white",
+          padding: 20,
+          flexShrink: 0,
+        }}
+      >
+        <h2 style={{ fontSize: "1.5rem", marginBottom: "30px", opacity: 0.8 }}>ADMIN PANEL</h2>
+        <nav>
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            <li>
+              <Link to="" style={linkStyle}>Dashboard</Link>
+            </li>
+            <li>
+              <Link to="users" style={linkStyle}>Users</Link>
+            </li>
+
+            {/* Templates Dropdown */}
+            <li>
+              <div
+                onClick={() => setShowTemplateDropdown(!showTemplateDropdown)}
+                style={{
+                  ...linkStyle,
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                Templates
+                <span>{showTemplateDropdown ? "▲" : "▼"}</span>
+              </div>
+              {showTemplateDropdown && (
+                <ul style={{ listStyle: "none", paddingLeft: "15px", marginTop: "5px" }}>
+                  <li>
+                    <Link to="templates/list" style={linkStyle}>Template List</Link>
+                  </li>
+                  <li>
+                    <Link to="templates/create" style={linkStyle}>Create Template</Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            <li>
+              <Link to="settings" style={linkStyle}>Settings</Link>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <div style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        {/* HEADER */}
+        <header
+          style={{
+            height: "60px",
+            backgroundColor: "#fff",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 30px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+            borderBottom: "1px solid #e9ecef",
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: "1.25rem", fontWeight: "bold" }}>{title}</h2>
           <button
             onClick={handleLogout}
             style={{
-              padding: "8px 15px",
+              padding: "6px 15px",
               backgroundColor: "#dc3545",
               color: "white",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "4px",
               cursor: "pointer",
+              fontWeight: "bold",
             }}
           >
             Logout
           </button>
-        </div>
+        </header>
 
-        {/* Content Area */}
-        <div style={layoutStyles.contentArea}>
-          <h2>Administrative Overview</h2>
-          <p>This area is secured by JWT verification in the middleware.</p>
-          <div style={{ padding: '20px', border: '1px solid #ccc', backgroundColor: 'white', marginTop: '20px' }}>
-            API Response Message: <strong>{msg}</strong>
-          </div>
-        </div>
+        {/* MAIN CONTENT AREA */}
+        <main style={{ flexGrow: 1, padding: 30 }}>
+            <Outlet />
+      
+        </main>
       </div>
     </div>
   );

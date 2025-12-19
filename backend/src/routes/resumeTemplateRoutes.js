@@ -1,19 +1,37 @@
 import express from "express";
 import {
-  getTemplates,
-  getTemplate,
-  createTemplate,
-  updateTemplate,
-  deleteTemplate
+  getResumeTemplates,
+  getResumeTemplate,
+  createResumeTemplate,
+  updateResumeTemplate,
+  deleteResumeTemplate
 } from "../controllers/resumeTemplateController.js";
+
 import { uploadTemplateThumbnail } from "../middleware/uploadTemplateThumbnail.js";
 
 const router = express.Router();
 
-router.get("/", getTemplates);
-router.get("/:id", getTemplate);
-router.post("/", uploadTemplateThumbnail.single("thumbnail"), createTemplate);
-router.put("/:id", uploadTemplateThumbnail.single("thumbnail"), updateTemplate);
-router.delete("/:id", deleteTemplate);
+// READ ALL
+router.get("/", getResumeTemplates);
+
+// READ ONE
+router.get("/:id", getResumeTemplate);
+
+// CREATE
+router.post(
+  "/",
+  uploadTemplateThumbnail.single("thumbnail"),
+  createResumeTemplate
+);
+
+// UPDATE
+router.put(
+  "/:id",
+  uploadTemplateThumbnail.single("thumbnail"),
+  updateResumeTemplate
+);
+
+// DELETE
+router.delete("/:id", deleteResumeTemplate);
 
 export default router;
