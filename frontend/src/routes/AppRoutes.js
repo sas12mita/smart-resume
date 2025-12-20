@@ -8,6 +8,7 @@ import AdminTemplateCreate from "../pages/admin/resumeTemplate/AdminTemplateCrea
 import AdminTemplateList from "../pages/admin/resumeTemplate/AdminTemplateList";
 import AdminTemplateEdit from "../pages/admin/resumeTemplate/AdminTemplateEdit"
 import AdminLogin from "../pages/admin/AdminLogin";
+import ResumeCreate from "../pages/user/resume/ResumeCreate"
 
 
 import UserDashboard from "../pages/user/UserDashboard";
@@ -23,7 +24,10 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/user/dashboard" element={<UserDashboard />}>
         <Route index element={<DashboardContent />} />   {/* 👈 DEFAULT */}
-        <Route path="resume/template" element={<TemplateSelect />} />
+        <Route path="resume/template-select" element={<TemplateSelect />} />
+        <Route path="resume/template/create/:templateTitle" element={<ResumeCreate />} />
+
+
         <Route path="setting" element={<Setting />} />
         <Route path="coverletter" element={<CoverLetter />} />
       </Route>

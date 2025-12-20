@@ -58,7 +58,7 @@ export default function UserDashboard() {
               <Link to="profile" style={linkStyle}>Dashboard</Link>
             </li>
             <li>
-              <Link to="resume/template" style={linkStyle}>My Resume</Link>
+              <Link to="resume/template-select" style={linkStyle}>My Resume</Link>
             </li>
             <li>
               <Link to="coverletter" style={linkStyle}>Cover Letter</Link>
@@ -105,23 +105,6 @@ export default function UserDashboard() {
 
         {/* MAIN CONTENT AREA - Gray Background */}
         <main style={{ flexGrow: 1, padding: 30 }}>
-          <h3 style={{ fontSize: "1.5rem", marginBottom: "10px" }}>Welcome Back!</h3>
-          <p style={{ fontSize: "1.1rem" }}>👋 {userData.name}</p>
-          <p>Status: <span style={{ fontWeight: "bold" }}>{userData.status}</span></p>
-
-          {userData.status === "Guest" && (
-            <div style={{ 
-              marginTop: 20, 
-              padding: "15px", 
-              backgroundColor: "#fff3cd", 
-              border: "1px solid #ffeeba", 
-              borderRadius: "4px",
-              color: "#856404"
-            }}>
-              ⚠ Data is saved in your browser (guest mode).
-            </div>
-          )}
-
           <div style={{ marginTop: "30px" }}>
             <Outlet />
           </div>
