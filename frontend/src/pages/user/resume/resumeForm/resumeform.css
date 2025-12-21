@@ -1,0 +1,107 @@
+/* layout */
+.layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  height: 100vh;
+  background: #f4f7fb;
+}
+
+/* LEFT */
+.left-panel {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* RIGHT */
+.right-panel {
+  padding: 30px;
+  background: #eef2f8;
+}
+
+/* section card */
+.section-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-left: 4px solid #2563eb;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* section header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 15px;
+  color: #1f2937;
+}
+
+/* add button */
+.add-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* form */
+.form-group {
+  margin-top: 12px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: #374151;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+}
+
+/* action buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.done-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* summary card */
+.summary-card {
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #374151;
+}
