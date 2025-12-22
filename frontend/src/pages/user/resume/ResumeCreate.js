@@ -1,5 +1,15 @@
+import React, { useState } from "react";
+import { useParams, Navigate } from "react-router-dom";
+import { initialData } from "./resumeForm/data/InitialDataSection";
+import './resumeForm/style/resumeform.css';
+import BioSection from "./resumeForm/BioSection";
+import EducationSection from "./resumeForm/EducationSection";
+import ExperienceSection from "./resumeForm/ExperienceSection";
+import SkillSection from "./resumeForm/SkillSection";
+
 export default function ResumeCreate() {
   const { templateTitle } = useParams();
+
 
   const [resumeData, setResumeData] = useState(initialData);
   const [openSection, setOpenSection] = useState(null);
@@ -14,75 +24,42 @@ export default function ResumeCreate() {
       {/* LEFT – ALL FORMS */}
       <div className="left">
 
-        <PersonalSection
-          open={openSection === "user"}
-          onOpen={() => setOpenSection("user")}
-          data={resumeData}
-          setData={setResumeData}
-        />
+
 
         <BioSection
           open={openSection === "bio"}
-          onOpen={() => setOpenSection("bio")}
+          onOpen={setOpenSection}   // pass state setter directly
           data={resumeData}
           setData={setResumeData}
         />
 
         <EducationSection
           open={openSection === "education"}
-          onOpen={() => setOpenSection("education")}
+          onOpen={setOpenSection}   // now can open/close
           data={resumeData}
           setData={setResumeData}
         />
 
         <ExperienceSection
           open={openSection === "experience"}
-          onOpen={() => setOpenSection("experience")}
+          onOpen={setOpenSection}
           data={resumeData}
           setData={setResumeData}
         />
 
-        <SkillsSection
-          open={openSection === "skills"}
-          onOpen={() => setOpenSection("skills")}
+        <SkillSection
+          open={openSection === "skill"}
+          onOpen={setOpenSection}
           data={resumeData}
           setData={setResumeData}
         />
 
-        <ProjectsSection
-          open={openSection === "projects"}
-          onOpen={() => setOpenSection("projects")}
-          data={resumeData}
-          setData={setResumeData}
-        />
 
-        <LanguagesSection
-          open={openSection === "languages"}
-          onOpen={() => setOpenSection("languages")}
-          data={resumeData}
-          setData={setResumeData}
-        />
 
-        <HobbiesSection
-          open={openSection === "hobbies"}
-          onOpen={() => setOpenSection("hobbies")}
-          data={resumeData}
-          setData={setResumeData}
-        />
-
-        <TrainingSection
-          open={openSection === "training"}
-          onOpen={() => setOpenSection("training")}
-          data={resumeData}
-          setData={setResumeData}
-        />
 
       </div>
 
-      {/* RIGHT – PREVIEW */}
-      <div className="right">
-        <ResumePreview template={templateTitle} data={resumeData} />
-      </div>
+
     </div>
   );
 }

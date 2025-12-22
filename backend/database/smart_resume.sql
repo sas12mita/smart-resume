@@ -11,7 +11,9 @@ CREATE TABLE users (
 
 CREATE TABLE bio (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT  NULL,
+    fullname VARCHAR(100) NOT NULL,
+    email VARCHAR(120) NOT NULL UNIQUE,
     phone VARCHAR(30),
     address VARCHAR(255),
     social_media JSON,
@@ -87,5 +89,6 @@ CREATE TABLE training (
     certificate_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    
 );
 
