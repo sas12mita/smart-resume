@@ -6,6 +6,9 @@ import BioSection from "./resumeForm/BioSection";
 import EducationSection from "./resumeForm/EducationSection";
 import ExperienceSection from "./resumeForm/ExperienceSection";
 import SkillSection from "./resumeForm/SkillSection";
+import AdvanceTemplate from "./template/AdvanceTemplate";
+import BasicTemplate from "./template/BasicTemplate";
+import ModernTemplate from "./template/ModernTemplate";
 
 export default function ResumeCreate() {
   const { templateTitle } = useParams();
@@ -17,7 +20,21 @@ export default function ResumeCreate() {
   const allowedTemplates = ["modern", "basic", "advance"];
   if (!allowedTemplates.includes(templateTitle)) {
     return <Navigate to="/resume/templates" replace />;
+
   }
+  const renderPreview = () => {
+  switch (templateTitle) {
+    case "basic":
+      return <BasicTemplate data={resumeData} />;
+    case "modern":
+      return <ModernTemplate data={resumeData} />;
+    case "advance":
+      return <AdvanceTemplate data={resumeData} />;
+    default:
+      return null;
+  }
+};
+
 
   return (
     <div className="layout">
@@ -59,6 +76,12 @@ export default function ResumeCreate() {
 
       </div>
 
+      {/* RIGHT – PREVIEW */}
+      <div className="right">
+        <div className="right">
+        
+          {renderPreview()}
+        </div>      </div>
 
     </div>
   );
