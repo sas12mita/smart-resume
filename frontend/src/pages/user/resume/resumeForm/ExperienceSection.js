@@ -19,7 +19,7 @@ export default function ExperienceSection({ open, onOpen, data, setData }) {
 
   return (
     <div className="section-card">
-      <div className="section-header" onClick={onOpen}>
+      <div className="section-header" onClick={() => onOpen("experience")}>
         <h4>Experience</h4>
         <button className="add-btn">Add</button>
       </div>

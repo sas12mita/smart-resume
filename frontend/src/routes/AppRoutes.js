@@ -25,12 +25,15 @@ function AppRoutes() {
       <Route path="/user/dashboard" element={<UserDashboard />}>
         <Route index element={<DashboardContent />} />   {/* 👈 DEFAULT */}
         <Route path="resume/template-select" element={<TemplateSelect />} />
-        <Route path="resume/template/create/:templateTitle" element={<ResumeCreate />} />
 
 
         <Route path="setting" element={<Setting />} />
         <Route path="coverletter" element={<CoverLetter />} />
       </Route>
+      <Route
+        path="/user/resume/create/:templateTitle"
+        element={<ResumeCreate />}
+      />
       <Route path="/admin/dashboard" element={<AdminDashboard />}>
         {/* Nested routes inside AdminDashboard */}
         <Route index element={<AdminDashboardContent />} />       {/* default */}

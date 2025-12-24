@@ -1,74 +1,104 @@
-/* layout */
-.layout {
-  display: grid;
-  grid-template-columns: 420px 1fr;
+/* Layout */
+.smart-layout {
+  display: flex;
   height: 100vh;
   background: #f4f7fb;
+  font-family: 'Inter', sans-serif;
 }
 
-/* LEFT */
-.left-panel {
-  padding: 20px;
-  overflow-y: auto;
+/* Sidebar */
+.smart-sidebar {
+  width: 90px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  border-right: 1px solid #e2e8f0;
 }
 
-/* RIGHT */
-.right-panel {
+.sidebar-item {
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  gap: 4px;
+  padding: 12px 0;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.sidebar-item.active, .sidebar-item:hover {
+  color: #2563eb;
+  background: #f0f4ff;
+  border-radius: 12px;
+}
+
+.sidebar-icon {
+  font-size: 22px;
+}
+
+.sidebar-item span {
+  font-size: 10px;
+  text-align: center;
+}
+
+/* Form area */
+.smart-form-area {
+  flex: 1;
   padding: 30px;
-  background: #eef2f8;
+  overflow-y: auto;
+  background: #ffffff;
 }
 
-/* section card */
+/* Preview area */
+.smart-preview {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background: #eef2f8;
+  border-left: 1px solid #e2e8f0;
+}
+
+/* Section card & form (same as before) */
 .section-card {
   background: #ffffff;
   border-radius: 10px;
-  padding: 16px;
+  padding: 20px;
   margin-bottom: 16px;
-  border-left: 4px solid #2563eb;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-left: 4px solid #2563eb;
 }
 
-/* section header */
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
+  margin-bottom: 16px;
 }
 
 .section-header h4 {
   margin: 0;
-  font-size: 15px;
-  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
 }
 
-/* add button */
-.add-btn {
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-/* form */
 .form-group {
-  margin-top: 12px;
+  margin-bottom: 16px;
 }
 
 .form-group label {
-  font-size: 12px;
+  display: block;
+  font-size: 13px;
   color: #374151;
   margin-bottom: 4px;
-  display: block;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
   outline: none;
@@ -79,29 +109,17 @@
   border-color: #2563eb;
 }
 
-/* action buttons */
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 12px;
 }
 
-.done-btn {
+.done-btn, .next-btn {
   background: #2563eb;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 20px;
   border-radius: 6px;
   cursor: pointer;
-}
-
-/* summary card */
-.summary-card {
-  background: #f9fafb;
-  border-radius: 6px;
-  padding: 10px;
-  margin-top: 10px;
-  font-size: 13px;
-  color: #374151;
+  font-weight: 500;
 }

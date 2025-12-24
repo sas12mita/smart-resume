@@ -20,7 +20,7 @@ export default function SkillSection({ open, onOpen, data, setData }) {
 
   return (
     <div className="section-card">
-      <div className="section-header" onClick={onOpen}>
+      <div className="section-header" onClick={() => onOpen("skill")}>
         <h4>Skills</h4>
         <button className="add-btn">Add</button>
       </div>

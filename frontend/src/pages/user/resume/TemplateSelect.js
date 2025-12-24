@@ -22,7 +22,7 @@ export default function TemplateSelect() {
   const navigate = useNavigate();
 
   const selectTemplate = (title) => {
-    navigate(`/user/dashboard/resume/template/create/${title.toLowerCase()}`);
+navigate(`/user/resume/create/${title.toLowerCase()}`);
   };
 
   return (
