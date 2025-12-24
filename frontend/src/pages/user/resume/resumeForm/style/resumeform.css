@@ -123,3 +123,86 @@
   cursor: pointer;
   font-weight: 500;
 }
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===== MAIN ===== */
+.resume-builder {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== NAVBAR ===== */
+.resume-navbar {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.template-switch button {
+  margin-left: 8px;
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.template-switch button.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+/* ===== BODY ===== */
+.resume-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 150px 550px 1fr;
+  background: #f4f7fb;
+}
+
+/* ===== SIDEBAR ===== */
+.resume-sidebar {
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 16px;
+}
+
+.resume-sidebar div {
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.resume-sidebar div.active,
+.resume-sidebar div:hover {
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+/* ===== FORM ===== */
+.resume-form {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ===== PREVIEW ===== */
+.resume-preview {
+  padding: 24px;
+  background: #eef2f8;
+  overflow-y: auto;
+}

@@ -1,76 +1,98 @@
 import React, { useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import { initialData } from "./resumeForm/data/InitialDataSection";
-import './resumeForm/style/resumeform.css';
+import "./resumeForm/style/resumeform.css";
 
 import BioSection from "./resumeForm/BioSection";
 import EducationSection from "./resumeForm/EducationSection";
 import ExperienceSection from "./resumeForm/ExperienceSection";
 import SkillSection from "./resumeForm/SkillSection";
 
-import AdvanceTemplate from "./template/AdvanceTemplate";
 import BasicTemplate from "./template/BasicTemplate";
 import ModernTemplate from "./template/ModernTemplate";
+import AdvanceTemplate from "./template/AdvanceTemplate";
 
 export default function ResumeCreate() {
   const { templateTitle } = useParams();
-  const [resumeData, setResumeData] = useState(initialData);
-  const [activeSection, setActiveSection] = useState("bio"); // start with Bio
+  const navigate = useNavigate();
 
-  const allowedTemplates = ["modern", "basic", "advance"];
+  const [resumeData, setResumeData] = useState(initialData);
+  const [activeSection, setActiveSection] = useState("bio");
+
+  const allowedTemplates = ["basic", "modern", "advance"];
   if (!allowedTemplates.includes(templateTitle)) {
     return <Navigate to="/resume/templates" replace />;
   }
 
   const renderForm = () => {
-    switch(activeSection) {
-      case "bio": return <BioSection open={true} onOpen={setActiveSection} data={resumeData} setData={setResumeData} next="education" />;
-      case "education": return <EducationSection open={true} onOpen={setActiveSection} data={resumeData} setData={setResumeData} next="experience" />;
-      case "experience": return <ExperienceSection open={true} onOpen={setActiveSection} data={resumeData} setData={setResumeData} next="skill" />;
-      case "skill": return <SkillSection open={true} onOpen={setActiveSection} data={resumeData} setData={setResumeData} next={null} />;
-      default: return null;
+    switch (activeSection) {
+      case "bio":
+        return <BioSection data={resumeData} setData={setResumeData} />;
+      case "education":
+        return <EducationSection data={resumeData} setData={setResumeData} />;
+      case "experience":
+        return <ExperienceSection data={resumeData} setData={setResumeData} />;
+      case "skill":
+        return <SkillSection data={resumeData} setData={setResumeData} />;
+      default:
+        return null;
     }
   };
 
   const renderPreview = () => {
     switch (templateTitle) {
-      case "basic": return <BasicTemplate data={resumeData} />;
-      case "modern": return <ModernTemplate data={resumeData} />;
-      case "advance": return <AdvanceTemplate data={resumeData} />;
-      default: return null;
+      case "basic":
+        return <BasicTemplate data={resumeData} />;
+      case "modern":
+        return <ModernTemplate data={resumeData} />;
+      case "advance":
+        return <AdvanceTemplate data={resumeData} />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="smart-layout">
-      {/* LEFT Sidebar */}
-      <div className="smart-sidebar">
-        <div className={`sidebar-item ${activeSection==="bio"?"active":""}`} onClick={() => setActiveSection("bio")}>
-          <span className="sidebar-icon">👤</span>
-          <span>About</span>
-        </div>
-        <div className={`sidebar-item ${activeSection==="education"?"active":""}`} onClick={() => setActiveSection("education")}>
-          <span className="sidebar-icon">🎓</span>
-          <span>Education</span>
-        </div>
-        <div className={`sidebar-item ${activeSection==="experience"?"active":""}`} onClick={() => setActiveSection("experience")}>
-          <span className="sidebar-icon">💼</span>
-          <span>Experience</span>
-        </div>
-        <div className={`sidebar-item ${activeSection==="skill"?"active":""}`} onClick={() => setActiveSection("skill")}>
-          <span className="sidebar-icon">🛠️</span>
-          <span>Skills</span>
+    <div className="resume-builder">
+
+      {/* ===== TOP NAVBAR ===== */}
+      <div className="resume-navbar">
+        <h3>Smart Resume</h3>
+
+        <div className="template-switch">
+          {allowedTemplates.map((tpl) => (
+            <button
+              key={tpl}
+              className={templateTitle === tpl ? "active" : ""}
+              onClick={() => navigate(`/user/resume/create/${tpl}`)}
+            >
+              {tpl.toUpperCase()}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* CENTER – Form Area */}
-      <div className="smart-form-area">
-        {renderForm()}
-      </div>
+      {/* ===== MAIN BODY ===== */}
+      <div className="resume-body">
 
-      {/* RIGHT – Preview */}
-      <div className="smart-preview">
-        {renderPreview()}
+        {/* LEFT SIDEBAR */}
+        <div className="resume-sidebar">
+          <div className={activeSection === "bio" ? "active" : ""} onClick={() => setActiveSection("bio")}>👤 Bio</div>
+          <div className={activeSection === "education" ? "active" : ""} onClick={() => setActiveSection("education")}>🎓 Education</div>
+          <div className={activeSection === "experience" ? "active" : ""} onClick={() => setActiveSection("experience")}>💼 Experience</div>
+          <div className={activeSection === "skill" ? "active" : ""} onClick={() => setActiveSection("skill")}>🛠 Skills</div>
+        </div>
+
+        {/* CENTER FORM */}
+        <div className="resume-form">
+          {renderForm()}
+        </div>
+
+        {/* RIGHT PREVIEW */}
+        <div className="resume-preview">
+          {renderPreview()}
+        </div>
+
       </div>
     </div>
   );
