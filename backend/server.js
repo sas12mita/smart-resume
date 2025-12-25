@@ -11,6 +11,7 @@ import bioRoutes from "./src/routes/bioRoutes.js";
 import educationRoutes from "./src/routes/educationRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js"
 import resumeTemplateRoutes from "./src/routes/resumeTemplateRoutes.js"
+import aiRoutes from "./src/routes/aiRoutes.js"
 
 
 dotenv.config();
@@ -31,7 +32,8 @@ app.use("/uploads/", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api/admin/resumetemplates", resumeTemplateRoutes);
 
-// Server Start
+app.use('/api', aiRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

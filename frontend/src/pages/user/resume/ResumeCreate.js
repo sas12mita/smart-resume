@@ -16,29 +16,79 @@ export default function ResumeCreate() {
   const { templateTitle } = useParams();
   const navigate = useNavigate();
 
+  // ✅ HOOKS MUST BE AT TOP (NO CONDITIONS ABOVE)
   const [resumeData, setResumeData] = useState(initialData);
   const [activeSection, setActiveSection] = useState("bio");
 
+  // 🔁 FORM FLOW ORDER
+  const sections = ["bio", "education", "experience", "skill"];
+  const currentIndex = sections.indexOf(activeSection);
+
+  const goNext = () => {
+    if (currentIndex < sections.length - 1) {
+      setActiveSection(sections[currentIndex + 1]);
+    }
+  };
+
+  const goBack = () => {
+    if (currentIndex > 0) {
+      setActiveSection(sections[currentIndex - 1]);
+    }
+  };
+
+  // ✅ SAFE TO RETURN AFTER HOOKS
   const allowedTemplates = ["basic", "modern", "advance"];
   if (!allowedTemplates.includes(templateTitle)) {
     return <Navigate to="/resume/templates" replace />;
   }
 
+  // 🔁 FORM RENDER
   const renderForm = () => {
     switch (activeSection) {
       case "bio":
-        return <BioSection data={resumeData} setData={setResumeData} />;
+        return (
+          <BioSection
+            data={resumeData}
+            setData={setResumeData}
+            onNext={goNext}
+          />
+        );
+
       case "education":
-        return <EducationSection data={resumeData} setData={setResumeData} />;
+        return (
+          <EducationSection
+            data={resumeData}
+            setData={setResumeData}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        );
+
       case "experience":
-        return <ExperienceSection data={resumeData} setData={setResumeData} />;
+        return (
+          <ExperienceSection
+            data={resumeData}
+            setData={setResumeData}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        );
+
       case "skill":
-        return <SkillSection data={resumeData} setData={setResumeData} />;
+        return (
+          <SkillSection
+            data={resumeData}
+            setData={setResumeData}
+            onBack={goBack}
+          />
+        );
+
       default:
         return null;
     }
   };
 
+  // 🔁 PREVIEW RENDER (YOUR EXISTING TEMPLATES)
   const renderPreview = () => {
     switch (templateTitle) {
       case "basic":
@@ -55,7 +105,7 @@ export default function ResumeCreate() {
   return (
     <div className="resume-builder">
 
-      {/* ===== TOP NAVBAR ===== */}
+      {/* ===== TOP NAV ===== */}
       <div className="resume-navbar">
         <h3>Smart Resume</h3>
 
@@ -72,15 +122,23 @@ export default function ResumeCreate() {
         </div>
       </div>
 
-      {/* ===== MAIN BODY ===== */}
+      {/* ===== BODY ===== */}
       <div className="resume-body">
 
         {/* LEFT SIDEBAR */}
         <div className="resume-sidebar">
-          <div className={activeSection === "bio" ? "active" : ""} onClick={() => setActiveSection("bio")}>👤 Bio</div>
-          <div className={activeSection === "education" ? "active" : ""} onClick={() => setActiveSection("education")}>🎓 Education</div>
-          <div className={activeSection === "experience" ? "active" : ""} onClick={() => setActiveSection("experience")}>💼 Experience</div>
-          <div className={activeSection === "skill" ? "active" : ""} onClick={() => setActiveSection("skill")}>🛠 Skills</div>
+          {sections.map((sec) => (
+            <div
+              key={sec}
+              className={activeSection === sec ? "active" : ""}
+              onClick={() => setActiveSection(sec)}
+            >
+              {sec === "bio" && "👤 Bio"}
+              {sec === "education" && "🎓 Education"}
+              {sec === "experience" && "💼 Experience"}
+              {sec === "skill" && "🛠 Skills"}
+            </div>
+          ))}
         </div>
 
         {/* CENTER FORM */}
