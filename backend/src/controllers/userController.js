@@ -1,6 +1,9 @@
 import { User } from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 export const register = async (req, res) => {
   try {
@@ -21,20 +24,40 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
+    /* ===== ENV LOGIN CHECK ===== */
+    if (
+      email === process.env.ENV_USER_EMAIL &&
+      password === process.env.ENV_USER_PASSWORD
+    ) {
+      const token = jwt.sign(
+        { role: "env_user" },
+        process.env.USER_JWT_SECRET,
+        { expiresIn: "7d" }
+      );
 
+      return res.json({
+        message: "Login success (ENV)",
+        token,
+      });
+    }
+
+    /* ===== DATABASE LOGIN CHECK ===== */
     const [rows] = await User.findByEmail(email);
-    if (rows.length === 0)
+    if (rows.length === 0) {
       return res.status(400).json({ message: "Invalid email" });
+    }
 
     const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match)
+    if (!match) {
       return res.status(400).json({ message: "Incorrect password" });
+    }
 
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET,
+      process.env.USER_JWT_SECRET,
       { expiresIn: "7d" }
     );
 

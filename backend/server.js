@@ -22,7 +22,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect Routes
-app.use("/api/users", userRoute);
+app.use("/api/user", userRoute);
 app.use("/api/bio", bioRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/admin", adminRoutes);

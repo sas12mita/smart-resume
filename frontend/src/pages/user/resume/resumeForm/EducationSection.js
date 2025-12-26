@@ -2,8 +2,9 @@ import React, { useState } from "react";
 
 export default function EducationSection({ data, setData, onNext, onBack }) {
 
-  // ✅ create fresh object every time (IMPORTANT)
+  // ✅ create fresh object with unique ID
   const createEmptyForm = () => ({
+    id: Date.now() + Math.random(),
     school: "",
     degree: "",
     city: "",
@@ -12,67 +13,89 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
     currentlyStudying: false,
   });
 
-  // ✅ initialize safely
+  // ✅ initialize education safely
   const [forms, setForms] = useState(
     data.education && data.education.length > 0
       ? data.education
       : [createEmptyForm()]
   );
 
-  const [showFormIndexes, setShowFormIndexes] = useState([0]);
+  // ✅ only ONE form open at a time (by ID)
+  const [openFormId, setOpenFormId] = useState(forms[0].id);
 
-  // ✅ ESLint-safe handler
-  const handleChange = (index, e) => {
+  // ✅ handle input change
+  const handleChange = (id, e) => {
     const { name, type, value, checked } = e.target;
-    const updated = [...forms];
 
-    updated[index][name] = type === "checkbox" ? checked : value;
+    const updated = forms.map((form) =>
+      form.id === id
+        ? { ...form, [name]: type === "checkbox" ? checked : value }
+        : form
+    );
 
     setForms(updated);
     setData({ ...data, education: updated });
   };
 
-  // ✅ add new education (collapse previous)
+  // ✅ add new education
   const addEducation = () => {
-    const newForms = [...forms, createEmptyForm()];
-    setForms(newForms);
-    setShowFormIndexes([newForms.length - 1]);
-    setData({ ...data, education: newForms });
+    const newForm = createEmptyForm();
+    const updated = [...forms, newForm];
+
+    setForms(updated);
+    setOpenFormId(newForm.id);
+    setData({ ...data, education: updated });
   };
 
-  // ✅ remove education
-  const removeEducation = (index) => {
-    const updatedForms = forms.filter((_, i) => i !== index);
-    setForms(updatedForms);
-    setShowFormIndexes(showFormIndexes.filter(i => i !== index));
-    setData({ ...data, education: updatedForms });
+  // ✅ remove education safely
+  const removeEducation = (id) => {
+    const updated = forms.filter((f) => f.id !== id);
+
+    setForms(updated);
+
+    if (openFormId === id) {
+      setOpenFormId(updated[updated.length - 1]?.id || null);
+    }
+
+    setData({ ...data, education: updated });
   };
 
   // ✅ validation before continue
   const handleContinue = () => {
-    for (let f of forms) {
-      if (!f.school || !f.startDate) {
-        alert("School and start date are required");
-        return;
-      }
-      if (!f.currentlyStudying && !f.endDate) {
-        alert("End date is required unless currently studying");
-        return;
-      }
-    }
+    
     onNext();
   };
 
   // 🎨 styles
   const s = {
-    container: { padding: "20px", background: "#fff" },
-    header: { fontSize: "26px", fontWeight: "bold", color: "#2563eb" },
-    sub: { fontSize: "13px", color: "#666", marginBottom: "20px" },
-    card: { border: "1px solid #e5e7eb", borderRadius: "6px", padding: "14px", marginBottom: "10px", background: "#f9fafb" },
-    input: { width: "100%", padding: "12px", border: "1px solid #d1d5db", borderRadius: "4px", background: "#f9fafb" },
-    label: { fontSize: "12px", fontWeight: "600", marginBottom: "4px" },
-    btnBlue: { background: "#2563eb", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" },
-    summary: { border: "1px solid #ddd", borderRadius: "6px", padding: "12px", marginBottom: "10px", background: "#fff" }
+    container: { padding: 20, background: "#fff" },
+    header: { fontSize: 26, fontWeight: "bold", color: "#2563eb" },
+    sub: { fontSize: 13, color: "#666", marginBottom: 20 },
+    card: { padding: 14, marginBottom: 10 },
+    input: {
+      width: "100%",
+      padding: 12,
+      border: "1px solid #d1d5db",
+      borderRadius: 4,
+      background: "#f9fafb",
+    },
+    label: { fontSize: 12, fontWeight: 600, marginBottom: 4 },
+    btnBlue: {
+      background: "#2563eb",
+      color: "#fff",
+      border: "none",
+      padding: "10px 20px",
+      borderRadius: 4,
+      cursor: "pointer",
+      fontWeight: "bold",
+    },
+    summary: {
+      border: "1px solid #ddd",
+      borderRadius: 6,
+      padding: 12,
+      marginBottom: 10,
+      background: "#fff",
+    },
   };
 
   return (
@@ -80,29 +103,42 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
       <h1 style={s.header}>Education</h1>
       <p style={s.sub}>Add your academic background</p>
 
-      {forms.map((form, index) => (
-        <div key={index}>
+      {forms.map((form) => (
+        <div key={form.id}>
 
-          {/* COLLAPSED VIEW */}
-          {!showFormIndexes.includes(index) && (
+          {/* COLLAPSED SUMMARY */}
+          {openFormId !== form.id && (
             <div style={s.summary}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <div>
-                  <strong>{form.school}</strong>
+                  <strong>{form.school || "Untitled Education"}</strong>
                   <div style={{ fontSize: 12, color: "#666" }}>
-                    {form.degree} | {form.city} | {form.startDate} – {form.currentlyStudying ? "Present" : form.endDate}
+                    {form.degree} | {form.city} |{" "}
+                    {form.startDate} –{" "}
+                    {form.currentlyStudying ? "Present" : form.endDate}
                   </div>
                 </div>
                 <div>
                   <button
-                    onClick={() => setShowFormIndexes([index])}
-                    style={{ marginRight: 10, background: "none", border: "none", color: "#2563eb", cursor: "pointer" }}
+                    onClick={() => setOpenFormId(form.id)}
+                    style={{
+                      marginRight: 10,
+                      background: "none",
+                      border: "none",
+                      color: "#2563eb",
+                      cursor: "pointer",
+                    }}
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => removeEducation(index)}
-                    style={{ background: "none", border: "none", color: "red", cursor: "pointer" }}
+                    onClick={() => removeEducation(form.id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "red",
+                      cursor: "pointer",
+                    }}
                   >
                     Delete
                   </button>
@@ -112,35 +148,72 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
           )}
 
           {/* EXPANDED FORM */}
-          {showFormIndexes.includes(index) && (
+          {openFormId === form.id && (
             <div style={s.card}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 15,
+                }}
+              >
                 <div style={{ gridColumn: "span 2" }}>
                   <label style={s.label}>School</label>
-                  <input name="school" value={form.school} onChange={(e) => handleChange(index, e)} style={s.input} />
+                  <input
+                    name="school"
+                    value={form.school}
+                    onChange={(e) => handleChange(form.id, e)}
+                    style={s.input}
+                  />
                 </div>
 
                 <div>
                   <label style={s.label}>Degree</label>
-                  <input name="degree" value={form.degree} onChange={(e) => handleChange(index, e)} style={s.input} />
+                  <input
+                    name="degree"
+                    value={form.degree}
+                    onChange={(e) => handleChange(form.id, e)}
+                    style={s.input}
+                  />
                 </div>
 
                 <div>
                   <label style={s.label}>City</label>
-                  <input name="city" value={form.city} onChange={(e) => handleChange(index, e)} style={s.input} />
+                  <input
+                    name="city"
+                    value={form.city}
+                    onChange={(e) => handleChange(form.id, e)}
+                    style={s.input}
+                  />
                 </div>
 
                 <div>
                   <label style={s.label}>Start Date</label>
-                  <input type="month" name="startDate" value={form.startDate} onChange={(e) => handleChange(index, e)} style={s.input} />
+                  <input
+                    type="month"
+                    name="startDate"
+                    value={form.startDate}
+                    onChange={(e) => handleChange(form.id, e)}
+                    style={s.input}
+                  />
                 </div>
 
                 <div>
                   <label style={s.label}>End Date</label>
                   {form.currentlyStudying ? (
-                    <input value="Present" disabled style={{ ...s.input, color: "#999" }} />
+                    <input
+                      value="Present"
+                      disabled
+                      style={{ ...s.input, color: "#999" }}
+                    />
                   ) : (
-                    <input type="month" name="endDate" value={form.endDate} onChange={(e) => handleChange(index, e)} style={s.input} />
+                    <input
+                      type="month"
+                      name="endDate"
+                      value={form.endDate}
+                      onChange={(e) => handleChange(form.id, e)}
+                      style={s.input}
+                    />
                   )}
                 </div>
               </div>
@@ -150,7 +223,7 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
                   type="checkbox"
                   name="currentlyStudying"
                   checked={form.currentlyStudying}
-                  onChange={(e) => handleChange(index, e)}
+                  onChange={(e) => handleChange(form.id, e)}
                 />{" "}
                 I currently study here
               </label>
@@ -158,7 +231,11 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
               <div style={{ marginTop: 10 }}>
                 <span
                   onClick={addEducation}
-                  style={{ color: "#2563eb", cursor: "pointer", fontWeight: 600 }}
+                  style={{
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
                 >
                   + Add Education
                 </span>
@@ -168,7 +245,13 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
         </div>
       ))}
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 30 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: 30,
+        }}
+      >
         <button onClick={onBack}>Back</button>
         <button onClick={handleContinue} style={s.btnBlue}>
           Continue to Experience →
