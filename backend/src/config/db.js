@@ -1,5 +1,6 @@
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import seedAdminUser from "./seedAdminUser.js"
 
 dotenv.config();
 
@@ -11,13 +12,17 @@ const db = mysql.createPool({
   connectionLimit: 10,
 });
 
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error("❌ Database connection failed:", err);
-  } else {
+/* ---------- CONNECT & SEED ---------- */
+db.getConnection()
+  .then(async (connection) => {
     console.log("✅ MySQL Connected!");
     connection.release();
-  }
-});
+
+    // 🔥 AUTO SEED
+    await seedAdminUser();
+  })
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err.message);
+  });
 
 export default db;

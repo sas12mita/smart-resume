@@ -25,22 +25,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(req.body);
-    /* ===== ENV LOGIN CHECK ===== */
-    if (
-      email === process.env.ENV_USER_EMAIL &&
-      password === process.env.ENV_USER_PASSWORD
-    ) {
-      const token = jwt.sign(
-        { role: "env_user" },
-        process.env.USER_JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-
-      return res.json({
-        message: "Login success (ENV)",
-        token,
-      });
-    }
+   
 
     /* ===== DATABASE LOGIN CHECK ===== */
     const [rows] = await User.findByEmail(email);
