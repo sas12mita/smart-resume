@@ -3,9 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-
   const navigate = useNavigate();
-  const API_URL = process.env.REACT_APP_API_URL;
+//  const API_URL = process.env.REACT_APP_API_URL;
 
   const [form, setForm] = useState({
     email: "",
@@ -19,12 +18,17 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-                const secureLoginEndpoint = `${API_URL}/api/user/login`; 
-console.log(secureLoginEndpoint)
-      const res = await axios.post(secureLoginEndpoint, form);
+      const secureLoginEndpoint = `http://localhost:5000/api/user/login`;
+
+      const res = await axios.post(secureLoginEndpoint, form, {
+        headers: { "Content-Type": "application/json" }
+      });
+
       localStorage.setItem("userToken", res.data.token);
       navigate("/user/dashboard");
+
     } catch (err) {
+      console.error(err);
       alert(err.response?.data?.message || "Login failed");
     }
   };

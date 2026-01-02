@@ -20,7 +20,7 @@ const seedAdminUser = async () => {
                 [adminEmail, hashedPassword]
             );
 
-                console.log(`👑 ADMIN LOGIN
+            console.log(`👑 ADMIN LOGIN
                 Email    : ${adminEmail}
                 Password : ${adminPassword}\n`);
 
@@ -39,29 +39,27 @@ const seedAdminUser = async () => {
         let userEmail = "user@example.com";
         let userPassword = "user123";
 
-        if (userRows.length === 0) {
+        if (userRows.length ===0) {
             const hashedPassword = await bcrypt.hash(userPassword, 10);
 
             await db.query(
                 "INSERT INTO users (fullname,email, password) VALUES (?,?, ?)",
-                ["first user",userEmail, hashedPassword]
+                ["first user", userEmail, hashedPassword]
             );
 
-            console.log(`👤 USER LOGIN
-Email    : ${userEmail}
-Password : ${userPassword}`);
+             console.log(`👤 USER LOGIN
+            Email    : ${userEmail}
+            Password : ${userPassword}`);
             console.log("✅ User created");
         } else {
             userEmail = userRows[0].email;
 
         }
 
-
-
         console.log("\n------------------------\n");
 
     } catch (error) {
-        console.error("❌ Seeder failed:", error.message);
+        console.error("❌ Seeder something wrong:", error.message);
     }
 };
 

@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS smartresume;
-USE smartresume;
+CREATE DATABASE IF NOT EXISTS smartresume_db;
+USE smartresume_db;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -91,4 +91,9 @@ CREATE TABLE training (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     
 );
-
+CREATE TABLE admins(
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

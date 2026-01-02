@@ -38,11 +38,20 @@ export default function UserDashboard() {
       }
 
       try {
-        const res = await axios.get("/api/user/dashboard", {
-          headers: { Authorization: "Bearer " + token },
-        });
+        const API_URL = process.env.REACT_APP_API_URL;
+
+        const res = await axios.get(
+          `${API_URL}/api/user/dashboard`,
+          {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        
         setUserData(res.data);
       } catch {
+        console.log(token)
         localStorage.removeItem("userToken");
         setUserData({ name: "Guest User", status: "Guest" });
       } finally {
