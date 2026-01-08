@@ -14,6 +14,7 @@ import ResumeCreate from "../pages/user/resume/ResumeCreate"
 import UserDashboard from "../pages/user/UserDashboard";
 import DashboardContent from "../pages/user/DashboardContent";
 import Login from "../pages/user/Login";
+import Register from "../pages/user/Register";
 import TemplateSelect from "../pages/user/resume/TemplateSelect";
 import Setting from "../pages/user/setting/Setting";
 import CoverLetter from "../pages/user/coverletter/CoverLetter";
@@ -36,6 +37,7 @@ function AppRoutes() {
         element={<ResumeCreate />}
       />
       <Route path="user/login" element={<Login />} />
+      <Route path="user/register" element={<Register />} />
 
       <Route path="/admin/dashboard" element={<AdminDashboard />}>
         {/* Nested routes inside AdminDashboard */}

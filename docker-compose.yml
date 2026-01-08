@@ -1,3 +1,4 @@
+# Remove the version line completely or use version: "3.8" at the top
 version: "3.8"
 
 services:
@@ -11,9 +12,10 @@ services:
       MYSQL_USER: devuser
       MYSQL_PASSWORD: devpass
     ports:
-      - "3306:3306"
+      - "3306:3306"  # Make sure this line is correct
     volumes:
       - mysql-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password  # Important for MySQL 8
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

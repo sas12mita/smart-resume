@@ -80,8 +80,8 @@ export default function ResumeBuilder({ data }) {
         <div style={styles.dropdown}>
            <span style={{fontWeight: 'bold'}}>☷ Professional 2</span> ⌵
         </div>
-        <button style={styles.downloadBtn} onClick={() => alert('Please Login to Download')}>
-          Login to Download <span style={{fontSize: '18px'}}>↓</span>
+        <button style={styles.downloadBtn}>
+          Download <span style={{fontSize: '18px'}}>↓</span>
         </button>
       </div>
 

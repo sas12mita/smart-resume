@@ -9,16 +9,20 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 2. Create bio table
 CREATE TABLE bio (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT  NULL,
+    user_id INT NULL,
     fullname VARCHAR(100) NOT NULL,
     email VARCHAR(120) NOT NULL UNIQUE,
+    designation VARCHAR(120),
     phone VARCHAR(30),
     address VARCHAR(255),
     social_media JSON,
+    summary TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE education (

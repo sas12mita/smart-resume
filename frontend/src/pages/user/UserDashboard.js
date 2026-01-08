@@ -51,9 +51,9 @@ export default function UserDashboard() {
         
         setUserData(res.data);
       } catch {
-        console.log(token)
-        localStorage.removeItem("userToken");
-        setUserData({ name: "Guest User", status: "Guest" });
+      console.log(token)
+        // localStorage.removeItem("userToken");
+        // setUserData({ name: "Guest User", status: "Guest" });
       } finally {
         setLoading(false);
       }
