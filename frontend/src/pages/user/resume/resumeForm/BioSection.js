@@ -9,21 +9,20 @@ export default function BioSection({ data, setData, onNext, onBack }) {
   const [errorMsg, setErrorMsg] = useState("");
 
   // CHECK IF LOGGED IN
-  const isLoggedIn = data?.token && data.token !== "";
+  const isLoggedIn = true;
+  console.log(isLoggedIn)
 
   /* =============================
-     LOAD BIO (GUEST / USER)
+      LOAD BIO (GUEST / USER)
   ============================== */
   useEffect(() => {
     if (!isLoggedIn) {
-      console.log("user login")
-      // Guest → load from localStorage
+      console.log("Loading guest data from localStorage");
       const savedBio = localStorage.getItem("bioData");
       if (savedBio) {
         setData((prev) => ({ ...prev, bio: JSON.parse(savedBio) }));
       }
     } else {
-      // Logged-in → fetch from backend
       const fetchBio = async () => {
         try {
           const API_URL = process.env.REACT_APP_API_URL;
@@ -42,10 +41,10 @@ export default function BioSection({ data, setData, onNext, onBack }) {
       };
       fetchBio();
     }
-  }, []);
+  }, [isLoggedIn, data.token, setData]);
 
   /* =============================
-     IMAGE UPLOAD (LOCAL ONLY)
+      IMAGE UPLOAD (LOCAL ONLY)
   ============================== */
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -62,7 +61,7 @@ export default function BioSection({ data, setData, onNext, onBack }) {
   };
 
   /* =============================
-     INPUT CHANGE
+      INPUT CHANGE
   ============================== */
   const handleChange = (e) => {
     setData({
@@ -72,7 +71,7 @@ export default function BioSection({ data, setData, onNext, onBack }) {
   };
 
   /* =============================
-     AI SUMMARY
+      AI SUMMARY
   ============================== */
   const generateSummary = async () => {
     if (!bio.designation) {
@@ -106,9 +105,11 @@ export default function BioSection({ data, setData, onNext, onBack }) {
   };
 
   /* =============================
-     SAVE & CONTINUE
+      SAVE & CONTINUE
   ============================== */
   const handleNext = async () => {
+    const API_URL = process.env.REACT_APP_API_URL;
+
     if (!isLoggedIn) {
       // Guest → localStorage
       localStorage.setItem("bioData", JSON.stringify(bio));
@@ -118,8 +119,7 @@ export default function BioSection({ data, setData, onNext, onBack }) {
 
     // Logged-in → backend
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
-      console.log("hello")
+      console.log("Attempting to save to backend...");
       await axios.post(
         `${API_URL}/api/bio`,
         {
@@ -132,7 +132,8 @@ export default function BioSection({ data, setData, onNext, onBack }) {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            // FIXED: Changed 'token' to 'data.token'
+            Authorization: `Bearer ${data.token}`,
           },
         }
       );
@@ -149,7 +150,7 @@ export default function BioSection({ data, setData, onNext, onBack }) {
   };
 
   /* =============================
-     STYLES
+      STYLES
   ============================== */
   const s = {
     container: { padding: "20px", backgroundColor: "#fff" },
@@ -196,18 +197,16 @@ export default function BioSection({ data, setData, onNext, onBack }) {
       justifyContent: "space-between",
       marginTop: "30px",
     },
-    btnBack: { padding: "10px 25px", border: "1px solid #333" },
+    btnBack: { padding: "10px 25px", border: "1px solid #333", cursor: "pointer" },
     btnNext: {
       padding: "10px 30px",
       background: "#2196f3",
       color: "#fff",
       border: "none",
+      cursor: "pointer"
     },
   };
 
-  /* =============================
-     JSX
-  ============================== */
   return (
     <div style={s.container}>
       <h1 style={s.title}>About Yourself</h1>
