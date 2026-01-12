@@ -16,11 +16,14 @@ export default function ResumeCreate() {
   const { templateTitle } = useParams();
   const navigate = useNavigate();
 
-  // ✅ HOOKS MUST BE AT TOP (NO CONDITIONS ABOVE)
-  const [resumeData, setResumeData] = useState(initialData);
+  // ✅ FIXED: Initialize with the token from localStorage so BioSection knows we are logged in
+  const [resumeData, setResumeData] = useState({
+    ...initialData,
+    token: localStorage.getItem("userToken") || "" 
+  });
+  
   const [activeSection, setActiveSection] = useState("bio");
 
-  // 🔁 FORM FLOW ORDER
   const sections = ["bio", "education", "experience", "skill"];
   const currentIndex = sections.indexOf(activeSection);
 
@@ -36,13 +39,11 @@ export default function ResumeCreate() {
     }
   };
 
-  // ✅ SAFE TO RETURN AFTER HOOKS
   const allowedTemplates = ["basic", "modern", "advance"];
   if (!allowedTemplates.includes(templateTitle)) {
     return <Navigate to="/resume/templates" replace />;
   }
 
-  // 🔁 FORM RENDER
   const renderForm = () => {
     switch (activeSection) {
       case "bio":
@@ -53,7 +54,6 @@ export default function ResumeCreate() {
             onNext={goNext}
           />
         );
-
       case "education":
         return (
           <EducationSection
@@ -63,7 +63,6 @@ export default function ResumeCreate() {
             onBack={goBack}
           />
         );
-
       case "experience":
         return (
           <ExperienceSection
@@ -73,7 +72,6 @@ export default function ResumeCreate() {
             onBack={goBack}
           />
         );
-
       case "skill":
         return (
           <SkillSection
@@ -82,33 +80,24 @@ export default function ResumeCreate() {
             onBack={goBack}
           />
         );
-
       default:
         return null;
     }
   };
 
-  // 🔁 PREVIEW RENDER (YOUR EXISTING TEMPLATES)
   const renderPreview = () => {
     switch (templateTitle) {
-      case "basic":
-        return <BasicTemplate data={resumeData} />;
-      case "modern":
-        return <ModernTemplate data={resumeData} />;
-      case "advance":
-        return <AdvanceTemplate data={resumeData} />;
-      default:
-        return null;
+      case "basic": return <BasicTemplate data={resumeData} />;
+      case "modern": return <ModernTemplate data={resumeData} />;
+      case "advance": return <AdvanceTemplate data={resumeData} />;
+      default: return null;
     }
   };
 
   return (
     <div className="resume-builder">
-
-      {/* ===== TOP NAV ===== */}
       <div className="resume-navbar">
         <h3>Smart Resume</h3>
-
         <div className="template-switch">
           {allowedTemplates.map((tpl) => (
             <button
@@ -122,10 +111,7 @@ export default function ResumeCreate() {
         </div>
       </div>
 
-      {/* ===== BODY ===== */}
       <div className="resume-body">
-
-        {/* LEFT SIDEBAR */}
         <div className="resume-sidebar">
           {sections.map((sec) => (
             <div
@@ -141,16 +127,8 @@ export default function ResumeCreate() {
           ))}
         </div>
 
-        {/* CENTER FORM */}
-        <div className="resume-form">
-          {renderForm()}
-        </div>
-
-        {/* RIGHT PREVIEW */}
-        <div className="resume-preview">
-          {renderPreview()}
-        </div>
-
+        <div className="resume-form">{renderForm()}</div>
+        <div className="resume-preview">{renderPreview()}</div>
       </div>
     </div>
   );

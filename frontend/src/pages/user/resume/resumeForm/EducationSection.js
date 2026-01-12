@@ -2,9 +2,7 @@ import React, { useState } from "react";
 
 export default function EducationSection({ data, setData, onNext, onBack }) {
 
-  // ✅ create fresh object with unique ID
-  const createEmptyForm = () => ({
-    id: Date.now() + Math.random(),
+  const emptyForm = () => ({
     school: "",
     degree: "",
     city: "",
@@ -13,249 +11,263 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
     currentlyStudying: false,
   });
 
-  // ✅ initialize education safely
-  const [forms, setForms] = useState(
-    data.education && data.education.length > 0
-      ? data.education
-      : [createEmptyForm()]
-  );
+  const [educations, setEducations] = useState(data.education || []);
+  const [formData, setFormData] = useState(emptyForm());
+  const [editingId, setEditingId] = useState(null);
 
-  // ✅ only ONE form open at a time (by ID)
-  const [openFormId, setOpenFormId] = useState(forms[0].id);
+  const syncParent = (updated) => {
+    setData({ ...data, education: updated });
+  };
 
-  // ✅ handle input change
-  const handleChange = (id, e) => {
+  const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
 
-    const updated = forms.map((form) =>
-      form.id === id
-        ? { ...form, [name]: type === "checkbox" ? checked : value }
-        : form
+  /* ---------- ADD ---------- */
+  const addEducation = () => {
+    const updated = [
+      {
+        id: Date.now() + Math.random(),
+        ...formData,
+      },
+      ...educations,
+    ];
+
+    setEducations(updated);
+    syncParent(updated);
+    setFormData(emptyForm());
+  };
+
+  /* ---------- EDIT ---------- */
+  const editEducation = (edu) => {
+    setEditingId(edu.id);
+    setFormData(edu);
+  };
+
+  /* ---------- UPDATE ---------- */
+  const updateEducation = () => {
+    const updated = educations.map((edu) =>
+      edu.id === editingId ? { ...edu, ...formData } : edu
     );
 
-    setForms(updated);
-    setData({ ...data, education: updated });
+    setEducations(updated);
+    syncParent(updated);
+    setEditingId(null);
+    setFormData(emptyForm());
   };
 
-  // ✅ add new education
-  const addEducation = () => {
-    const newForm = createEmptyForm();
-    const updated = [...forms, newForm];
-
-    setForms(updated);
-    setOpenFormId(newForm.id);
-    setData({ ...data, education: updated });
-  };
-
-  // ✅ remove education safely
+  /* ---------- DELETE ---------- */
   const removeEducation = (id) => {
-    const updated = forms.filter((f) => f.id !== id);
+    const updated = educations.filter((e) => e.id !== id);
+    setEducations(updated);
+    syncParent(updated);
 
-    setForms(updated);
-
-    if (openFormId === id) {
-      setOpenFormId(updated[updated.length - 1]?.id || null);
+    if (editingId === id) {
+      setEditingId(null);
+      setFormData(emptyForm());
     }
-
-    setData({ ...data, education: updated });
   };
 
-  // ✅ validation before continue
-  const handleContinue = () => {
-    
-    onNext();
-  };
-
-  // 🎨 styles
+  /* ---------- ORIGINAL STYLES ---------- */
   const s = {
-    container: { padding: 20, background: "#fff" },
-    header: { fontSize: 26, fontWeight: "bold", color: "#2563eb" },
-    sub: { fontSize: 13, color: "#666", marginBottom: 20 },
-    card: { padding: 14, marginBottom: 10 },
+    container: { padding: 20, background: "#fff", maxWidth: "600px" },
+    label: { fontSize: 13, fontWeight: "bold", display: "block", marginBottom: 5 },
     input: {
       width: "100%",
-      padding: 12,
-      border: "1px solid #d1d5db",
-      borderRadius: 4,
-      background: "#f9fafb",
+      padding: "10px",
+      border: "1px solid #ddd",
+      borderRadius: "5px",
+      marginBottom: "15px",
+      boxSizing: "border-box"
     },
-    label: { fontSize: 12, fontWeight: 600, marginBottom: 4 },
-    btnBlue: {
+    summaryCard: {
+      border: "1px solid #e5e7eb",
+      borderRadius: "8px",
+      padding: "15px",
+      marginTop: "10px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    },
+    buttonGroup: {
+      display: "flex",
+      gap: "10px",
+      marginTop: "20px"
+    },
+    primaryButton: {
+      padding: "10px 20px",
       background: "#2563eb",
       color: "#fff",
       border: "none",
-      padding: "10px 20px",
-      borderRadius: 4,
+      borderRadius: "5px",
       cursor: "pointer",
-      fontWeight: "bold",
+      fontWeight: "bold"
     },
-    summary: {
-      border: "1px solid #ddd",
-      borderRadius: 6,
-      padding: 12,
-      marginBottom: 10,
-      background: "#fff",
-    },
+    secondaryButton: {
+      padding: "10px 20px",
+      background: "#f3f4f6",
+      color: "#374151",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer"
+    }
   };
 
   return (
     <div style={s.container}>
-      <h1 style={s.header}>Education</h1>
-      <p style={s.sub}>Add your academic background</p>
+      <h2 style={{ color: "#2563eb" }}>Education</h2>
+      <p style={{ color: "#666", fontSize: 13 }}>
+        Add your academic background
+      </p>
 
-      {forms.map((form) => (
-        <div key={form.id}>
-
-          {/* COLLAPSED SUMMARY */}
-          {openFormId !== form.id && (
-            <div style={s.summary}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  <strong>{form.school || "Untitled Education"}</strong>
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    {form.degree} | {form.city} |{" "}
-                    {form.startDate} –{" "}
-                    {form.currentlyStudying ? "Present" : form.endDate}
-                  </div>
-                </div>
-                <div>
-                  <button
-                    onClick={() => setOpenFormId(form.id)}
-                    style={{
-                      marginRight: 10,
-                      background: "none",
-                      border: "none",
-                      color: "#2563eb",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => removeEducation(form.id)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "red",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
+      {/* ================= SUMMARY ================= */}
+      <div style={{ marginBottom: 30 }}>
+        {educations.map((edu) =>
+          editingId === edu.id ? null : (
+            <div key={edu.id} style={s.summaryCard}>
+              <div>
+                <strong style={{ display: "block" }}>
+                  {edu.school || "Untitled Education"}
+                </strong>
+                <span style={{ fontSize: 12, color: "#666" }}>
+                  {edu.degree} {edu.degree && "|"} {edu.city}
+                </span>
+                <div style={{ fontSize: 12, color: "#666", marginTop: 5 }}>
+                  {edu.startDate} -{" "}
+                  {edu.currentlyStudying ? "Present" : edu.endDate}
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* EXPANDED FORM */}
-          {openFormId === form.id && (
-            <div style={s.card}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 15,
-                }}
-              >
-                <div style={{ gridColumn: "span 2" }}>
-                  <label style={s.label}>School</label>
-                  <input
-                    name="school"
-                    value={form.school}
-                    onChange={(e) => handleChange(form.id, e)}
-                    style={s.input}
-                  />
-                </div>
-
-                <div>
-                  <label style={s.label}>Degree</label>
-                  <input
-                    name="degree"
-                    value={form.degree}
-                    onChange={(e) => handleChange(form.id, e)}
-                    style={s.input}
-                  />
-                </div>
-
-                <div>
-                  <label style={s.label}>City</label>
-                  <input
-                    name="city"
-                    value={form.city}
-                    onChange={(e) => handleChange(form.id, e)}
-                    style={s.input}
-                  />
-                </div>
-
-                <div>
-                  <label style={s.label}>Start Date</label>
-                  <input
-                    type="month"
-                    name="startDate"
-                    value={form.startDate}
-                    onChange={(e) => handleChange(form.id, e)}
-                    style={s.input}
-                  />
-                </div>
-
-                <div>
-                  <label style={s.label}>End Date</label>
-                  {form.currentlyStudying ? (
-                    <input
-                      value="Present"
-                      disabled
-                      style={{ ...s.input, color: "#999" }}
-                    />
-                  ) : (
-                    <input
-                      type="month"
-                      name="endDate"
-                      value={form.endDate}
-                      onChange={(e) => handleChange(form.id, e)}
-                      style={s.input}
-                    />
-                  )}
-                </div>
-              </div>
-
-              <label style={{ fontSize: 13, display: "block", marginTop: 10 }}>
-                <input
-                  type="checkbox"
-                  name="currentlyStudying"
-                  checked={form.currentlyStudying}
-                  onChange={(e) => handleChange(form.id, e)}
-                />{" "}
-                I currently study here
-              </label>
-
-              <div style={{ marginTop: 10 }}>
-                <span
-                  onClick={addEducation}
+              <div>
+                <button
+                  onClick={() => editEducation(edu)}
                   style={{
                     color: "#2563eb",
+                    background: "none",
+                    border: "none",
                     cursor: "pointer",
-                    fontWeight: 600,
+                    marginRight: 10
                   }}
                 >
-                  + Add Education
-                </span>
+                  Edit
+                </button>
+                <button
+                  onClick={() => removeEducation(edu.id)}
+                  style={{
+                    color: "red",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          )}
-        </div>
-      ))}
+          )
+        )}
+      </div>
 
+      {/* ================= FORM ================= */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: 30,
+          marginBottom: 30,
+          padding: "20px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+          background: "#f9fafb"
         }}
       >
-        <button onClick={onBack}>Back</button>
-        <button onClick={handleContinue} style={s.btnBlue}>
-          Continue to Experience →
-        </button>
+        <h3 style={{ marginTop: 0, marginBottom: 20, color: "#374151" }}>
+          {editingId ? "Edit Education" : "Add New Education"}
+        </h3>
+
+        <label style={s.label}>School</label>
+        <input
+          name="school"
+          value={formData.school}
+          onChange={handleChange}
+          style={s.input}
+        />
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+          <div>
+            <label style={s.label}>Degree</label>
+            <input
+              name="degree"
+              value={formData.degree}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </div>
+          <div>
+            <label style={s.label}>City</label>
+            <input
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+          <div>
+            <label style={s.label}>Start Date</label>
+            <input
+              type="month"
+              name="startDate"
+              value={formData.startDate}
+              onChange={handleChange}
+              style={s.input}
+            />
+          </div>
+          <div>
+            <label style={s.label}>End Date</label>
+            <input
+              type="month"
+              name="endDate"
+              disabled={formData.currentlyStudying}
+              value={formData.currentlyStudying ? "" : formData.endDate}
+              onChange={handleChange}
+              style={{
+                ...s.input,
+                background: formData.currentlyStudying ? "#f0f0f0" : "#fff"
+              }}
+            />
+          </div>
+        </div>
+
+        <label style={{ fontSize: 13, display: "flex", gap: 8 }}>
+          <input
+            type="checkbox"
+            name="currentlyStudying"
+            checked={formData.currentlyStudying}
+            onChange={handleChange}
+          />
+          I currently study here
+        </label>
+
+        <div style={s.buttonGroup}>
+          {editingId ? (
+            <button onClick={updateEducation} style={s.primaryButton}>
+              Update Education
+            </button>
+          ) : (
+            <button onClick={addEducation} style={s.primaryButton}>
+              + Add Education
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ================= NAVIGATION ================= */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 40 }}>
+        <button onClick={onBack} style={s.secondaryButton}>Back</button>
+        <button onClick={onNext} style={s.primaryButton}>Continue →</button>
       </div>
     </div>
   );

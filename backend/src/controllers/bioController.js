@@ -4,7 +4,8 @@ import { Bio } from "../models/bioModel.js";
 export const saveBio = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const { fullname, email, designation, phone, address, summary } = req.body;
+    // Extract photo from request body
+    const { fullname, email, designation, phone, address, summary, photo } = req.body;
 
     if (!fullname || !email) {
       return res.status(400).json({ error: "Fullname and email are required" });
@@ -20,9 +21,9 @@ export const saveBio = async (req, res) => {
         designation,
         phone,
         address,
-        summary
+        summary,
+        photo // Added photo here
       );
-
       return res.json({ message: "Bio updated successfully" });
     }
 
@@ -33,7 +34,8 @@ export const saveBio = async (req, res) => {
       designation,
       phone,
       address,
-      summary
+      summary,
+      photo // Added photo here
     );
 
     res.json({ message: "Bio created successfully" });

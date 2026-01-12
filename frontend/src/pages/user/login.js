@@ -23,8 +23,8 @@ export default function Login() {
       const res = await axios.post(secureLoginEndpoint, form, {
         headers: { "Content-Type": "application/json" }
       });
-
       localStorage.setItem("userToken", res.data.token);
+
       navigate("/user/dashboard");
 
     } catch (err) {
@@ -152,8 +152,8 @@ export default function Login() {
       {/* Background decorations */}
       <div style={styles.decoration}></div>
       <div style={styles.decoration2}></div>
-      
-      <div 
+
+      <div
         style={styles.authBox}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "translateY(-5px)";
@@ -166,8 +166,8 @@ export default function Login() {
       >
         <div style={styles.logo}>🔐 SecureLogin</div>
         <h2 style={styles.title}>Welcome Back</h2>
-        <form 
-          style={styles.form} 
+        <form
+          style={styles.form}
           onSubmit={handleSubmit}
         >
           <input
@@ -198,8 +198,8 @@ export default function Login() {
               e.target.style.backgroundColor = "#f8fafc";
             }}
           />
-          <button 
-            className="btn-blue" 
+          <button
+            className="btn-blue"
             type="submit"
             style={styles.button}
             onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
@@ -215,7 +215,7 @@ export default function Login() {
         <Link to="/user/register" style={styles.link}>
           Don't have an account? <span style={styles.linkSpan}>Sign up here</span>
         </Link>
-      </div> 
+      </div>
     </div>
   );
 }
