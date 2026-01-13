@@ -61,6 +61,7 @@ export default function ResumeCreate() {
             setData={setResumeData}
             onNext={goNext}
             onBack={goBack}
+            
           />
         );
       case "experience":

@@ -27,11 +27,12 @@ CREATE TABLE bio (
 
 CREATE TABLE education (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     institution VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
     degree VARCHAR(255) NOT NULL,
-    start_year YEAR,
-    end_year YEAR,
+    start_date YEAR NULL,
+    end_date YEAR NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
