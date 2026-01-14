@@ -39,11 +39,12 @@ CREATE TABLE education (
 
 CREATE TABLE experience (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT  NULL,
     company VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NULL
     role VARCHAR(255) NOT NULL,
-    start_date DATE,
-    end_date DATE,
+    start_date DATE NULL,
+    end_date DATE NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

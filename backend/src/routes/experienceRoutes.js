@@ -4,10 +4,14 @@ import {
   getExperiences,
   getExperienceById,
   updateExperience,
-  deleteExperience
+  deleteExperience,
 } from "../controllers/experienceController.js";
+import userAuth from "../middleware/userAuth.js";
 
 const router = express.Router();
+
+// All experience routes should be protected by authentication
+router.use(userAuth);
 
 router.post("/", createExperience);
 router.get("/", getExperiences);

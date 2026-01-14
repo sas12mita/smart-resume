@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function EducationSection({ data, setData, onNext, onBack }) {
   const API_URL = "http://localhost:5000/api/education";
@@ -15,6 +16,7 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
 
   const [educations, setEducations] = useState([]);
   const [formData, setFormData] = useState(emptyForm());
+  const [fieldErrors, setFieldErrors] = useState({}); 
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +30,6 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
     localStorage.setItem("resumeEducation", JSON.stringify(updated));
   };
 
-  // ✅ HELPER: Formats ISO String (1997-05-06T...) to Input Date (1997-05-06)
   const formatForInput = (dateStr) => {
     if (!dateStr) return "";
     return dateStr.split("T")[0]; 
@@ -40,7 +41,6 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       
-      // ✅ CLEAN THE DATES HERE
       const mapped = res.data.map((item) => ({
         id: item.id,
         institution: item.institution,
@@ -74,11 +74,33 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    // Clear red error as user fixes the field
+    if (fieldErrors[name]) {
+      setFieldErrors({ ...fieldErrors, [name]: "" });
+    }
+  };
+
+  const validate = () => {
+    let errors = {};
+    if (!formData.institution) errors.institution = "Institution name is required.";
+    if (!formData.degree) errors.degree = "Degree is required.";
+    if (!formData.start_date) errors.start_date = "Please select a start date.";
+
+    // ✅ Date Logic: Check if End Date is before Start Date
+    if (!formData.currentlyStudying && formData.end_date && formData.start_date) {
+      if (new Date(formData.end_date) < new Date(formData.start_date)) {
+        errors.end_date = "End date cannot be earlier than your start date.";
+      }
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const saveEducation = async () => {
-    setLoading(true);
+    if (!validate()) return;
 
+    setLoading(true);
     const eduData = {
       degree: formData.degree,
       institution: formData.institution,
@@ -100,26 +122,27 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
         }
         await fetchEducationFromDB();
       } else {
-        if (editingId) {
-          const updated = educations.map((edu) =>
-            edu.id === editingId ? { ...edu, ...formData } : edu
-          );
-          setEducations(updated);
-          syncParent(updated);
-          saveToLocalStorage(updated);
-        } else {
-          const newEdu = { id: Date.now() + Math.random(), ...formData };
-          const updated = [newEdu, ...educations];
-          setEducations(updated);
-          syncParent(updated);
-          saveToLocalStorage(updated);
-        }
+        const updated = editingId
+          ? educations.map((edu) => (edu.id === editingId ? { ...edu, ...formData } : edu))
+          : [{ id: Date.now() + Math.random(), ...formData }, ...educations];
+
+        setEducations(updated);
+        syncParent(updated);
+        saveToLocalStorage(updated);
       }
 
+      // Success is silent: reset form and clear errors
       setEditingId(null);
       setFormData(emptyForm());
+      setFieldErrors({});
     } catch (err) {
-      console.error("Failed to save education:", err);
+      // ✅ Only show Swal on unexpected system/server errors
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: "There was an error saving your data. Please try again.",
+        confirmButtonColor: "#2563eb"
+      });
     } finally {
       setLoading(false);
     }
@@ -127,16 +150,28 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
 
   const editEducation = (edu) => {
     setEditingId(edu.id);
-    // ✅ Use cleaned dates so the form inputs can display them
     setFormData({
       ...edu,
       start_date: formatForInput(edu.start_date),
       end_date: formatForInput(edu.end_date),
     });
+    setFieldErrors({}); // Clear any leftover red errors
   };
 
   const removeEducation = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
+    // ✅ Swal only for confirmation
+    const result = await Swal.fire({
+      title: "Delete this education?",
+      text: "This cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#374151",
+      confirmButtonText: "Yes, delete it"
+    });
+
+    if (!result.isConfirmed) return;
+
     setLoading(true);
     try {
       if (isLoggedIn) {
@@ -150,18 +185,24 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
         syncParent(updated);
         saveToLocalStorage(updated);
       }
+      // Success after delete is silent
     } catch (err) {
-      console.error("Delete failed:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Delete Failed",
+        text: "Could not remove this entry.",
+        confirmButtonColor: "#2563eb"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------- STYLES (UNTOUCHED) ---------- */
   const s = {
     container: { padding: 20, background: "#fff", maxWidth: "600px" },
     label: { fontSize: 13, fontWeight: "bold", display: "block", marginBottom: 5 },
-    input: { width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "5px", marginBottom: "15px", boxSizing: "border-box" },
+    input: { width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "5px", marginBottom: "5px", boxSizing: "border-box" },
+    errorText: { color: "red", fontSize: "11px", display: "block", marginBottom: "10px" },
     summaryCard: { border: "1px solid #e5e7eb", borderRadius: "8px", padding: "15px", marginTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" },
     buttonGroup: { display: "flex", gap: "10px", marginTop: "20px" },
     primaryButton: { padding: "10px 20px", background: "#2563eb", color: "#fff", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" },
@@ -173,7 +214,7 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
       <h2 style={{ color: "#2563eb" }}>Education</h2>
       <p style={{ color: "#666", fontSize: 13 }}>Add your academic background</p>
 
-      {/* Summary */}
+      {/* Summary List */}
       <div style={{ marginBottom: 30 }}>
         {educations.map((edu) =>
           editingId === edu.id ? null : (
@@ -194,19 +235,31 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
         )}
       </div>
 
-      {/* Form */}
+      {/* Entry Form */}
       <div style={{ marginBottom: 30, padding: 20, border: "1px solid #e5e7eb", borderRadius: 8, background: "#f9fafb" }}>
         <h3 style={{ marginTop: 0, marginBottom: 20, color: "#374151" }}>{editingId ? "Edit Education" : "Add New Education"}</h3>
-        <label style={s.label}>institution</label>
-        <input name="institution" value={formData.institution} onChange={handleChange} style={s.input} disabled={loading} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
-          <div><label style={s.label}>Degree</label><input name="degree" value={formData.degree} onChange={handleChange} style={s.input} disabled={loading} /></div>
-          <div><label style={s.label}>City</label><input name="city" value={formData.city} onChange={handleChange} style={s.input} disabled={loading} /></div>
+        
+        <label style={s.label}>Institution</label>
+        <input name="institution" value={formData.institution} onChange={handleChange} style={s.input} disabled={loading} placeholder="e.g. Harvard University" />
+        {fieldErrors.institution && <span style={s.errorText}>{fieldErrors.institution}</span>}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15, marginTop: 10 }}>
+          <div>
+            <label style={s.label}>Degree</label>
+            <input name="degree" value={formData.degree} onChange={handleChange} style={s.input} disabled={loading} placeholder="e.g. Bachelor of Science" />
+            {fieldErrors.degree && <span style={s.errorText}>{fieldErrors.degree}</span>}
+          </div>
+          <div>
+            <label style={s.label}>City</label>
+            <input name="city" value={formData.city} onChange={handleChange} style={s.input} disabled={loading} placeholder="e.g. New York" />
+          </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15, marginTop: 10 }}>
           <div>
             <label style={s.label}>Start Date</label>
             <input type="date" name="start_date" value={formData.start_date} onChange={handleChange} style={s.input} disabled={loading} />
+            {fieldErrors.start_date && <span style={s.errorText}>{fieldErrors.start_date}</span>}
           </div>
           <div>
             <label style={s.label}>End Date</label>
@@ -218,16 +271,24 @@ export default function EducationSection({ data, setData, onNext, onBack }) {
               disabled={formData.currentlyStudying || loading}
               style={{ ...s.input, background: formData.currentlyStudying ? "#f0f0f0" : "#fff" }}
             />
+            {fieldErrors.end_date && <span style={s.errorText}>{fieldErrors.end_date}</span>}
           </div>
         </div>
-        <label style={{ fontSize: 13, display: "flex", gap: 8 }}>
+
+        <label style={{ fontSize: 13, display: "flex", gap: 8, marginTop: 10, cursor: "pointer" }}>
           <input type="checkbox" name="currentlyStudying" checked={formData.currentlyStudying} onChange={handleChange} disabled={loading} />
           I currently study here
         </label>
+
         <div style={s.buttonGroup}>
           <button onClick={saveEducation} style={s.primaryButton} disabled={loading}>
             {editingId ? (loading ? "Updating..." : "Update Education") : (loading ? "Adding..." : "+ Add Education")}
           </button>
+          {editingId && (
+            <button onClick={() => { setEditingId(null); setFormData(emptyForm()); setFieldErrors({}); }} style={s.secondaryButton}>
+              Cancel
+            </button>
+          )}
         </div>
       </div>
 
