@@ -52,19 +52,19 @@ CREATE TABLE experience (
 
 CREATE TABLE skills (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     skill_name VARCHAR(100) NOT NULL,
-    skill_level VARCHAR(50),
+    skill_level VARCHAR(50) Null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT  NULL,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
-    link VARCHAR(255),
+    description TEXT NULL,
+    link VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

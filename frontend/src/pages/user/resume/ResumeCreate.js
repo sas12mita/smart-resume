@@ -3,11 +3,17 @@ import { useParams, Navigate, useNavigate } from "react-router-dom";
 import { initialData } from "./resumeForm/data/InitialDataSection";
 import "./resumeForm/style/resumeform.css";
 
+/* ===== FORM SECTIONS ===== */
 import BioSection from "./resumeForm/BioSection";
 import EducationSection from "./resumeForm/EducationSection";
 import ExperienceSection from "./resumeForm/ExperienceSection";
 import SkillSection from "./resumeForm/SkillSection";
+import ProjectSection from "./resumeForm/ProjectSection"
+import TrainingSection from "./resumeForm/TrainingSection";
+import LanguageSection from "./resumeForm/LanguageSection";
+import HobbiesSection from "./resumeForm/HobbiesSection";
 
+/* ===== TEMPLATES ===== */
 import BasicTemplate from "./template/BasicTemplate";
 import ModernTemplate from "./template/ModernTemplate";
 import AdvanceTemplate from "./template/AdvanceTemplate";
@@ -16,15 +22,25 @@ export default function ResumeCreate() {
   const { templateTitle } = useParams();
   const navigate = useNavigate();
 
-  // ✅ FIXED: Initialize with the token from localStorage so BioSection knows we are logged in
   const [resumeData, setResumeData] = useState({
     ...initialData,
-    token: localStorage.getItem("userToken") || "" 
+    token: localStorage.getItem("userToken") || "",
   });
-  
+
   const [activeSection, setActiveSection] = useState("bio");
 
-  const sections = ["bio", "education", "experience", "skill"];
+  /* ===== ALL SECTIONS ===== */
+  const sections = [
+    "bio",
+    "education",
+    "experience",
+    "skill",
+    "project",
+    "training",
+    "language",
+    "hobbies",
+  ];
+
   const currentIndex = sections.indexOf(activeSection);
 
   const goNext = () => {
@@ -44,54 +60,49 @@ export default function ResumeCreate() {
     return <Navigate to="/resume/templates" replace />;
   }
 
+  /* ===== RENDER FORM ===== */
   const renderForm = () => {
     switch (activeSection) {
       case "bio":
-        return (
-          <BioSection
-            data={resumeData}
-            setData={setResumeData}
-            onNext={goNext}
-          />
-        );
+        return <BioSection data={resumeData} setData={setResumeData} onNext={goNext} />;
+
       case "education":
-        return (
-          <EducationSection
-            data={resumeData}
-            setData={setResumeData}
-            onNext={goNext}
-            onBack={goBack}
-            
-          />
-        );
+        return <EducationSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
       case "experience":
-        return (
-          <ExperienceSection
-            data={resumeData}
-            setData={setResumeData}
-            onNext={goNext}
-            onBack={goBack}
-          />
-        );
+        return <ExperienceSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
       case "skill":
-        return (
-          <SkillSection
-            data={resumeData}
-            setData={setResumeData}
-            onBack={goBack}
-          />
-        );
+        return <SkillSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
+      case "project":
+        return <ProjectSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
+      case "training":
+        return <TrainingSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
+      case "language":
+        return <LanguageSection data={resumeData} setData={setResumeData} onNext={goNext} onBack={goBack} />;
+
+      case "hobbies":
+        return <HobbiesSection data={resumeData} setData={setResumeData} onBack={goBack} />;
+
       default:
         return null;
     }
   };
 
+  /* ===== RENDER PREVIEW ===== */
   const renderPreview = () => {
     switch (templateTitle) {
-      case "basic": return <BasicTemplate data={resumeData} />;
-      case "modern": return <ModernTemplate data={resumeData} />;
-      case "advance": return <AdvanceTemplate data={resumeData} />;
-      default: return null;
+      case "basic":
+        return <BasicTemplate data={resumeData} />;
+      case "modern":
+        return <ModernTemplate data={resumeData} />;
+      case "advance":
+        return <AdvanceTemplate data={resumeData} />;
+      default:
+        return null;
     }
   };
 
@@ -124,6 +135,10 @@ export default function ResumeCreate() {
               {sec === "education" && "🎓 Education"}
               {sec === "experience" && "💼 Experience"}
               {sec === "skill" && "🛠 Skills"}
+              {sec === "project" && "📂 Projects"}
+              {sec === "training" && "📜 Training"}
+              {sec === "language" && "🌍 Language"}
+              {sec === "hobbies" && "🎯 Hobbies"}
             </div>
           ))}
         </div>
