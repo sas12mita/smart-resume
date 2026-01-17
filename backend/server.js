@@ -15,8 +15,11 @@ import experienceRoutes from "./src/routes/experienceRoutes.js";
 import skillRoutes from "./src/routes/skillRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import resumeTemplateRoutes from "./src/routes/resumeTemplateRoutes.js";
+import languageRoutes from "./src/routes/langauageRoutes.js"
+import trainingRoutes from "./src/routes/trainingRoutes.js"
+import hobbyRoutes from "./src/routes/hobbyRoutes.js"
 import aiRoutes from "./src/routes/aiRoutes.js";
-
+import projectRoutes from "./src/routes/projectRoutes.js";
 const app = express();
 
 // ✅ CORS middleware (must come FIRST)
@@ -40,7 +43,12 @@ app.use("/api/bio", bioRoutes);
 app.use("/api/education", educationRoutes);
 app.use("/api/experience", experienceRoutes);
 app.use("/api/skill", skillRoutes);
+app.use("/api/project", projectRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/languages", languageRoutes);
+app.use("/api/hobbies", hobbyRoutes);
+app.use("/api/training", trainingRoutes);
+
 app.use("/api/admin/resumetemplates", resumeTemplateRoutes);
 app.use("/api", aiRoutes);
 

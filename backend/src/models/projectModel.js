@@ -1,21 +1,47 @@
 import db from "../config/db.js";
 
-const Project = {
-  create: (data, callback) => {
-    db.query("INSERT INTO projects SET ?", data, callback);
+export const Project = {
+  /* ================= CREATE ================= */
+  create: (user_id, title, description, link) => {
+    return db.query(
+      `INSERT INTO projects 
+       (user_id, title, description, link)
+       VALUES (?, ?, ?, ?)`,
+      [user_id, title, description, link]
+    );
   },
-  findAll: (callback) => {
-    db.query("SELECT * FROM projects", callback);
-  },
-  findById: (id, callback) => {
-    db.query("SELECT * FROM projects WHERE id = ?", [id], callback);
-  },
-  update: (id, data, callback) => {
-    db.query("UPDATE projects SET ? WHERE id = ?", [data, id], callback);
-  },
-  delete: (id, callback) => {
-    db.query("DELETE FROM projects WHERE id = ?", [id], callback);
-  }
-};
 
-export default Project;
+  /* ================= READ ALL BY USER ================= */
+  getAllByUser: (user_id) => {
+    return db.query(
+      "SELECT * FROM projects WHERE user_id = ? ORDER BY created_at DESC",
+      [user_id]
+    );
+  },
+
+  /* ================= READ SINGLE ================= */
+  getById: (id, user_id) => {
+    return db.query(
+      "SELECT * FROM projects WHERE id = ? AND user_id = ?",
+      [id, user_id]
+    );
+  },
+
+  /* ================= UPDATE ================= */
+  update: (id, user_id, title, description, link) => {
+    return db.query(
+      `UPDATE projects 
+       SET title = ?, description = ?, link = ?
+       WHERE id = ? AND user_id = ?`,
+      [title, description, link, id, user_id]
+    );
+  },
+
+  /* ================= DELETE ================= */
+  remove: (id, user_id) => {
+    return db.query(
+      "DELETE FROM projects WHERE id = ? AND user_id = ?",
+      [id, user_id]
+    );
+  },
+};

@@ -1,36 +1,75 @@
-import Project from "../models/projectModel.js";
+import { Project } from "../models/projectModel.js";
 
-export const createProject = (req, res) => {
-  Project.create(req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Project created", id: result.insertId });
-  });
+/* CREATE PROJECT */
+export const createProject = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { title, description, link } = req.body;
+
+    await Project.create(user_id, title, description, link);
+    res.status(201).json({ message: "Project added successfully" });
+  } catch (err) {
+    console.error("Create project error:", err);
+    res.status(500).json({ message: "Failed to add project", error: err.message });
+  }
 };
 
-export const getProjects = (req, res) => {
-  Project.findAll((err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+/* GET ALL PROJECTS */
+export const getProjects = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const [rows] = await Project.getAllByUser(user_id);
+    res.json(rows);
+  } catch (err) {
+    console.error("Get projects error:", err);
+    res.status(500).json({ message: "Failed to fetch projects", error: err.message });
+  }
 };
 
-export const getProjectById = (req, res) => {
-  Project.findById(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result[0]);
-  });
+/* GET SINGLE PROJECT */
+export const getProjectById = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
+
+    const [rows] = await Project.getById(id, user_id);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Get single project error:", err);
+    res.status(500).json({ message: "Error fetching project", error: err.message });
+  }
 };
 
-export const updateProject = (req, res) => {
-  Project.update(req.params.id, req.body, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Project updated" });
-  });
+/* UPDATE PROJECT */
+export const updateProject = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
+    const { title, description, link } = req.body;
+
+    await Project.update(id, user_id, title, description, link);
+    res.json({ message: "Project updated successfully" });
+  } catch (err) {
+    console.error("Update project error:", err);
+    res.status(500).json({ message: "Failed to update project", error: err.message });
+  }
 };
 
-export const deleteProject = (req, res) => {
-  Project.delete(req.params.id, (err) => {
-    if (err) return res.status(500).json(err);
+/* DELETE PROJECT */
+export const deleteProject = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
+
+    await Project.remove(id, user_id);
     res.json({ message: "Project deleted successfully" });
-  });
+  } catch (err) {
+    console.error("Delete project error:", err);
+    res.status(500).json({ message: "Failed to delete project", error: err.message });
+  }
 };

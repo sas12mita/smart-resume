@@ -71,16 +71,16 @@ CREATE TABLE projects (
 
 CREATE TABLE languages (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     language_name VARCHAR(100) NOT NULL,
-    proficiency VARCHAR(50),
+    proficiency VARCHAR(50) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE hobbies (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT  NULL,
     hobby_name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -88,14 +88,13 @@ CREATE TABLE hobbies (
 
 CREATE TABLE training (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     title VARCHAR(255) NOT NULL,
     institution VARCHAR(255),
     completion_date DATE,
     certificate_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    
 );
 CREATE TABLE admins(
   id BIGINT PRIMARY KEY AUTO_INCREMENT,

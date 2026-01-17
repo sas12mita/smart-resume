@@ -2,17 +2,17 @@ import express from "express";
 import {
   createHobby,
   getHobbies,
-  getHobby,
   updateHobby,
-  deleteHobby
+  deleteHobby,
 } from "../controllers/hobbyController.js";
+
+import userAuth from "../middleware/userAuth.js";
 
 const router = express.Router();
 
-router.post("/", createHobby);
-router.get("/:user_id", getHobbies);
-router.get("/single/:id", getHobby);
-router.put("/:id", updateHobby);
-router.delete("/:id", deleteHobby);
+router.post("/", userAuth, createHobby);
+router.get("/", userAuth, getHobbies);
+router.put("/:id", userAuth, updateHobby);
+router.delete("/:id", userAuth, deleteHobby);
 
 export default router;

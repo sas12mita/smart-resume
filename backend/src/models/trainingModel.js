@@ -1,21 +1,35 @@
 import db from "../config/db.js";
 
-const Training = {
-  create: (data, callback) => {
-    db.query("INSERT INTO training SET ?", data, callback);
+export const Training = {
+  create: (user_id, title, institution, completion_date, certificate_link) => {
+    return db.query(
+      `INSERT INTO training 
+       (user_id, title, institution, completion_date, certificate_link)
+       VALUES (?, ?, ?, ?, ?)`,
+      [user_id, title, institution, completion_date, certificate_link]
+    );
   },
-  findAll: (callback) => {
-    db.query("SELECT * FROM training", callback);
-  },
-  findById: (id, callback) => {
-    db.query("SELECT * FROM training WHERE id = ?", [id], callback);
-  },
-  update: (id, data, callback) => {
-    db.query("UPDATE training SET ? WHERE id = ?", [data, id], callback);
-  },
-  delete: (id, callback) => {
-    db.query("DELETE FROM training WHERE id = ?", [id], callback);
-  }
-};
 
-export default Training;
+  getAllByUser: (user_id) => {
+    return db.query(
+      "SELECT * FROM training WHERE user_id = ? ORDER BY completion_date DESC",
+      [user_id]
+    );
+  },
+
+  update: (id, user_id, title, institution, completion_date, certificate_link) => {
+    return db.query(
+      `UPDATE training 
+       SET title = ?, institution = ?, completion_date = ?, certificate_link = ?
+       WHERE id = ? AND user_id = ?`,
+      [title, institution, completion_date, certificate_link, id, user_id]
+    );
+  },
+
+  remove: (id, user_id) => {
+    return db.query(
+      "DELETE FROM training WHERE id = ? AND user_id = ?",
+      [id, user_id]
+    );
+  },
+};

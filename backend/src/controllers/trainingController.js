@@ -1,36 +1,48 @@
-import Training from "../models/trainingModel.js";
+import { Training } from "../models/trainingModel.js";
 
-export const createTraining = (req, res) => {
-  Training.create(req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Training created", id: result.insertId });
-  });
+export const createTraining = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { title, institution, completion_date, certificate_link } = req.body;
+
+    await Training.create(user_id, title, institution, completion_date, certificate_link);
+    res.status(201).json({ message: "Training added successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add training", error: err.message });
+  }
 };
 
-export const getTrainings = (req, res) => {
-  Training.findAll((err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+export const getTrainings = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const [rows] = await Training.getAllByUser(user_id);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch training", error: err.message });
+  }
 };
 
-export const getTrainingById = (req, res) => {
-  Training.findById(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result[0]);
-  });
+export const updateTraining = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
+    const { title, institution, completion_date, certificate_link } = req.body;
+
+    await Training.update(id, user_id, title, institution, completion_date, certificate_link);
+    res.json({ message: "Training updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update training", error: err.message });
+  }
 };
 
-export const updateTraining = (req, res) => {
-  Training.update(req.params.id, req.body, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Training updated" });
-  });
-};
+export const deleteTraining = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
 
-export const deleteTraining = (req, res) => {
-  Training.delete(req.params.id, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Training deleted" });
-  });
+    await Training.remove(id, user_id);
+    res.json({ message: "Training deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete training", error: err.message });
+  }
 };

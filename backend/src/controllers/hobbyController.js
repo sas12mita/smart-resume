@@ -1,36 +1,48 @@
-import Hobby from "../models/hobbyModel.js";
+import { Hobby } from "../models/hobbyModel.js";
 
-export const createHobby = (req, res) => {
-  Hobby.create(req.body, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Hobby added", id: result.insertId });
-  });
+export const createHobby = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { hobby_name } = req.body;
+
+    await Hobby.create(user_id, hobby_name);
+    res.status(201).json({ message: "Hobby added successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to add hobby", error: err.message });
+  }
 };
 
-export const getHobbies = (req, res) => {
-  Hobby.getAll(req.params.user_id, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  });
+export const getHobbies = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const [rows] = await Hobby.getAllByUser(user_id);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch hobbies", error: err.message });
+  }
 };
 
-export const getHobby = (req, res) => {
-  Hobby.getById(req.params.id, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result[0]);
-  });
+export const updateHobby = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
+    const { hobby_name } = req.body;
+
+    await Hobby.update(id, user_id, hobby_name);
+    res.json({ message: "Hobby updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update hobby", error: err.message });
+  }
 };
 
-export const updateHobby = (req, res) => {
-  Hobby.update(req.params.id, req.body, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Hobby updated" });
-  });
-};
+export const deleteHobby = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { id } = req.params;
 
-export const deleteHobby = (req, res) => {
-  Hobby.delete(req.params.id, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Hobby deleted" });
-  });
+    await Hobby.remove(id, user_id);
+    res.json({ message: "Hobby deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete hobby", error: err.message });
+  }
 };
