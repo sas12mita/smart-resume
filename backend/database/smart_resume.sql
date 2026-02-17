@@ -18,7 +18,7 @@ CREATE TABLE bio (
     designation VARCHAR(120),
     phone VARCHAR(30),
     address VARCHAR(255),
-    social_media JSON,
+    photo VARCHAR(255) NOT NULL,
     summary TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -41,7 +41,7 @@ CREATE TABLE experience (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT  NULL,
     company VARCHAR(255) NOT NULL,
-    city VARCHAR(255) NULL
+    city VARCHAR(255) NULL,
     role VARCHAR(255) NOT NULL,
     start_date DATE NULL,
     end_date DATE NULL,
