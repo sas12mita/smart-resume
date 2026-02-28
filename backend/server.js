@@ -20,6 +20,8 @@ import trainingRoutes from "./src/routes/trainingRoutes.js"
 import hobbyRoutes from "./src/routes/hobbyRoutes.js"
 import aiRoutes from "./src/routes/aiRoutes.js";
 import projectRoutes from "./src/routes/projectRoutes.js";
+import paymentRoutes from "./src/routes/paymentRoutes.js";
+
 const app = express();
 
 // ✅ CORS middleware (must come FIRST)
@@ -48,8 +50,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/languages", languageRoutes);
 app.use("/api/hobbies", hobbyRoutes);
 app.use("/api/training", trainingRoutes);
-
+app.use("/api/payment",paymentRoutes);
 app.use("/api/admin/resumetemplates", resumeTemplateRoutes);
+
+
+
+
 app.use("/api", aiRoutes);
 
 // ✅ Start server

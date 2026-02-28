@@ -15,7 +15,6 @@ import HobbiesSection from "./resumeForm/HobbiesSection";
 
 /* ===== TEMPLATES ===== */
 import BasicTemplate from "./template/BasicTemplate";
-import ModernTemplate from "./template/ModernTemplate";
 import AdvanceTemplate from "./template/AdvanceTemplate";
 
 export default function ResumeCreate() {
@@ -55,7 +54,7 @@ export default function ResumeCreate() {
     }
   };
 
-  const allowedTemplates = ["basic", "modern", "advance"];
+  const allowedTemplates = ["basic", "advance"];
   if (!allowedTemplates.includes(templateTitle)) {
     return <Navigate to="/resume/templates" replace />;
   }
@@ -97,8 +96,7 @@ export default function ResumeCreate() {
     switch (templateTitle) {
       case "basic":
         return <BasicTemplate data={resumeData} />;
-      case "modern":
-        return <ModernTemplate data={resumeData} />;
+      
       case "advance":
         return <AdvanceTemplate data={resumeData} />;
       default:

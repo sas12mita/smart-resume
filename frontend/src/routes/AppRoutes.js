@@ -18,6 +18,7 @@ import Register from "../pages/user/Register";
 import TemplateSelect from "../pages/user/resume/TemplateSelect";
 import Setting from "../pages/user/setting/Setting";
 import CoverLetter from "../pages/user/coverletter/CoverLetter";
+import PaymentCheckout from "../pages/user/resume/PaymentCheckout"
 
 
 function AppRoutes() {
@@ -27,6 +28,7 @@ function AppRoutes() {
       <Route path="/user/dashboard" element={<UserDashboard />}>
         <Route index element={<DashboardContent />} />   {/* 👈 DEFAULT */}
         <Route path="resume/template-select" element={<TemplateSelect />} />
+        <Route path="resume/checkout" element={<PaymentCheckout />} />
 
 
         <Route path="setting" element={<Setting />} />

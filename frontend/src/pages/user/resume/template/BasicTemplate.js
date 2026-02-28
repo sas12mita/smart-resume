@@ -1,26 +1,101 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function ResumeBuilder({ data }) {
-  // Enhanced content check including all new sections
-  const hasContent = 
-    data.bio?.fullname || 
-    data.bio?.email || 
-    (data.experience?.length > 0) ||
-    (data.education?.length > 0) ||
-    (data.skills?.length > 0) ||
-    (data.projects?.length > 0) ||
-    (data.training?.length > 0);
+  const paperRef = useRef(null);
+  const [pageBreaks, setPageBreaks] = useState([]);
 
-  const handlePrint = () => {
-    window.print();
+  // Updated hasContent to check for designation and skill_name from your schema
+  const hasContent = data.bio?.fullname || data.experience?.length > 0 || data.skills?.length > 0;
+
+  // Calculate page breaks for preview
+  useEffect(() => {
+    if (!paperRef.current || !hasContent) return;
+
+    const calculatePageBreaks = () => {
+      const element = paperRef.current;
+      const pageHeight = 297; // A4 height in mm
+      const contentHeight = element.scrollHeight / 3.78; // Convert pixels to mm (approximate)
+      
+      const breaks = [];
+      for (let i = 1; i < Math.ceil(contentHeight / pageHeight); i++) {
+        breaks.push(i * pageHeight);
+      }
+      setPageBreaks(breaks);
+    };
+
+    // Small delay to ensure content is rendered
+    setTimeout(calculatePageBreaks, 100);
+  }, [data, hasContent]);
+
+  const handleDownloadPDF = async () => {
+    const element = paperRef.current;
+    if (!element) return;
+
+    // Save original styles
+    const originalStyle = element.style.cssText;
+    element.style.backgroundImage = 'none';
+    element.style.backgroundColor = '#ffffff';
+    element.style.margin = '0';
+    element.style.padding = '0';
+
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+      allowTaint: true,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight
+    });
+
+    // Restore original styles
+    element.style.cssText = originalStyle;
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ 
+      orientation: 'portrait', 
+      unit: 'mm', 
+      format: 'a4',
+      compress: true
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    
+    const imgWidth = pdfWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    const NEXT_PAGE_TOP_MARGIN = 20; 
+    
+    let position = 0;
+    let heightLeft = imgHeight;
+
+    // Add first page
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pdfHeight;
+
+    // Add subsequent pages with top margin
+    while (heightLeft > -10) {
+      position = position - pdfHeight + NEXT_PAGE_TOP_MARGIN;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+    }
+
+    pdf.save(`${data.bio?.fullname || 'Resume'}.pdf`);
   };
 
   const styles = {
     wrapper: {
-      backgroundColor: '#f4f7fa',
+      backgroundColor: '#94a3b8',
       minHeight: '100vh',
       padding: '40px 0',
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      fontFamily: "'Inter', sans-serif",
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     toolbar: {
       display: 'flex',
@@ -28,225 +103,270 @@ export default function ResumeBuilder({ data }) {
       alignItems: 'center',
       width: '210mm',
       margin: '0 auto 20px auto',
-    },
-    dropdown: {
-      padding: '8px 16px',
-      backgroundColor: '#fff',
-      border: '1px solid #ddd',
-      borderRadius: '4px',
-      fontSize: '14px',
-      color: '#333',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px'
+      backgroundColor: '#94a3b8',
+      padding: '0 10px',
     },
     downloadBtn: {
       backgroundColor: '#2563eb',
       color: '#fff',
-      padding: '10px 20px',
+      marginRight:'-20px',
+      padding: '10px 24px',
       border: 'none',
-      borderRadius: '4px',
-      fontWeight: 'bold',
+      borderRadius: '6px',
+      fontWeight: '600',
       cursor: 'pointer',
       fontSize: '14px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
+      transition: 'background-color 0.2s',
     },
     paper: {
       backgroundColor: '#fff',
       width: '210mm',
-      minHeight: '297mm', 
+      minHeight: '297mm',
       margin: '0 auto',
-      boxShadow: '0 0 15px rgba(0,0,0,0.1)',
       position: 'relative',
-      backgroundImage: 'linear-gradient(to bottom, transparent 296.5mm, #e0e0e0 296.5mm, #e0e0e0 297mm, transparent 297mm)',
-      backgroundSize: '100% 297mm',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+      backgroundImage: 'none',
+      overflow: 'visible',
     },
-    emptyState: {
-      height: '297mm',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      color: '#ccc',
-      fontSize: '18px'
+    pageBreakIndicator: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      height: '2px',
+      backgroundColor: '#1d1a1a',
+      opacity: 0.5,
+      zIndex: 10,
+      margin:'10px',
+      pointerEvents: 'none',
+    },
+    pageBreakLabel: {
+      position: 'absolute',
+      right: '10px',
+      top: '-20px',
+      backgroundColor: '#131313',
+      color: 'white',
+      fontSize: '10px',
+      padding: '2px 6px',
+      borderRadius: '4px',
+      opacity: 0.8,
     }
   };
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.toolbar} className="no-print">
-        <div style={styles.dropdown}>
-           <span style={{fontWeight: 'bold'}}>☷ Professional Template</span> ⌵
-        </div>
-        <button style={styles.downloadBtn} onClick={handlePrint}>
-          Print / Save PDF <span style={{fontSize: '18px'}}>↓</span>
+        <button 
+          style={styles.downloadBtn} 
+          onClick={handleDownloadPDF}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+        >
+          Download PDF
         </button>
       </div>
 
-      <div style={styles.paper}>
+      <div style={styles.paper} ref={paperRef}>
         {!hasContent ? (
-          <div style={styles.emptyState}>No content added yet. Start filling your bio!</div>
+          <div style={{padding: '50px', textAlign: 'center', color: '#94a3b8'}}>Enter details...</div>
         ) : (
-          <ProfessionalTemplate data={data} />
+          <>
+            <BasicTemplate data={data} />
+            {pageBreaks.map((position, index) => (
+              <div 
+                key={index}
+                style={{
+                  ...styles.pageBreakIndicator,
+                  top: `${position * 3.78}px`,
+                }}
+              >
+                <div style={styles.pageBreakLabel}>
+                  Page {index + 2} (20mm margin)
+                </div>
+              </div>
+            ))}
+          </>
         )}
       </div>
 
       <style>{`
-        @media print {
-          body { background: none !important; padding: 0 !important; }
-          .no-print { display: none !important; }
-          div { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
-          @page { size: A4; margin: 0; }
-          section, .resume-item { page-break-inside: avoid; }
-          div { background-image: none !important; }
+        @media print { 
+          .no-print { display: none !important; } 
         }
-        /* Handle Quill HTML content */
-        .description-content ul, .description-content ol { padding-left: 20px; margin: 5px 0; }
+        .resume-item { 
+          margin-bottom: 1.5rem; 
+        }
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
       `}</style>
     </div>
   );
 }
 
-function ProfessionalTemplate({ data }) {
+// BasicTemplate Component - Fully matched to your SQL Schema
+function BasicTemplate({ data }) {
   const styles = {
-    container: { padding: '15mm 20mm', color: '#333', lineHeight: '1.5' },
-    header: { marginBottom: '20px' },
-    name: { fontSize: '28pt', fontWeight: 'bold', margin: '0', color: '#000', textTransform: 'uppercase' },
-    designation: { fontSize: '14pt', color: '#2563eb', fontWeight: '600', marginTop: '5px' },
-    contactRow: { display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '10px', fontSize: '10pt', color: '#555' },
-    section: { marginTop: '20px' },
-    sectionTitle: {
-      fontSize: '12pt', fontWeight: 'bold', textTransform: 'uppercase',
-      borderBottom: '2px solid #333', paddingBottom: '3px', marginBottom: '10px', color: '#000'
+    container: { 
+      padding: '20mm', 
+      color: '#000', 
+      lineHeight: '1.4', 
+      textAlign: 'left',
+      backgroundColor: '#ffffff',
+      position: 'relative',
+      zIndex: 1,
     },
-    item: { marginBottom: '15px' },
-    itemHeader: { display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '11pt' },
-    subText: { fontStyle: 'italic', color: '#444', fontSize: '10.5pt' },
-    desc: { fontSize: '10pt', marginTop: '5px', textAlign: 'justify' },
-    gridContainer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' },
-    skillTag: { fontSize: '10pt', background: '#f0f0f0', padding: '2px 8px', borderRadius: '4px', marginRight: '5px', display: 'inline-block', marginBottom: '5px' }
+    header: { marginBottom: '20px' },
+    name: { fontSize: '32px', fontWeight: '800', margin: '0 0 5px 0', color: '#000' },
+    // Matched to column: bio.designation
+    jobTitle: { 
+      fontSize: '18px', 
+      textDecoration: 'underline', 
+      marginBottom: '20px', 
+      display: 'block',
+      color: '#000',
+    },
+    table: { width: '100%', marginBottom: '25px', fontSize: '14px', borderCollapse: 'collapse' },
+    label: { width: '150px', fontWeight: '400', paddingBottom: '5px', color: '#000', verticalAlign: 'top' },
+    sectionTitle: { 
+      fontSize: '16px', fontWeight: 'bold', textTransform: 'uppercase', 
+      marginTop: '25px', marginBottom: '10px', color: '#000',
+      borderBottom: '1px solid #000', paddingBottom: '5px',
+    },
+    bold: { fontWeight: 'bold', fontSize: '16px', color: '#000' },
+    text: { fontSize: '14px', color: '#000', marginTop: '5px' },
+    skillsContainer: { display: 'flex', flexWrap: 'wrap', gap: '10px' },
+    skillItem: { fontSize: '14px', color: '#000' },
+    hobbiesContainer: { display: 'flex', flexWrap: 'wrap', gap: '10px' },
+    hobbyItem: { fontSize: '14px', color: '#000' }
   };
 
   return (
     <div style={styles.container}>
-      {/* HEADER */}
+      {/* BIO SECTION - Matches bio table */}
       <header style={styles.header}>
-        <h1 style={styles.name}>{data.bio?.fullname || "Your Name"}</h1>
-        <p style={styles.designation}>{data.bio?.designation || data.experience?.[0]?.role}</p>
-        
-        <div style={styles.contactRow}>
-          {data.bio?.email && <span>✉ {data.bio.email}</span>}
-          {data.bio?.phone && <span>📞 {data.bio.phone}</span>}
-          {data.bio?.address && <span>📍 {data.bio.address}</span>}
-        </div>
+        <h1 style={styles.name}>{data.bio?.fullname || ' '}</h1>
+        <span style={styles.jobTitle}>{data.bio?.designation || ' '}</span>
+        <table style={styles.table}>
+          <tbody>
+            <tr><td style={styles.label}>Address</td><td>{data.bio?.address || ' '}</td></tr>
+            <tr><td style={styles.label}>Contact Number</td><td>{data.bio?.phone || ' '}</td></tr>
+            <tr><td style={styles.label}>Email</td><td>{data.bio?.email || ' '}</td></tr>
+          </tbody>
+        </table>
       </header>
 
-      {/* SUMMARY */}
+      {/* SUMMARY - bio.summary */}
       {data.bio?.summary && (
-        <section style={styles.section}>
+        <section className="resume-item">
           <h2 style={styles.sectionTitle}>Summary</h2>
-          <div style={styles.desc} dangerouslySetInnerHTML={{ __html: data.bio.summary }} />
+          <div style={styles.text} dangerouslySetInnerHTML={{ __html: data.bio.summary }} />
         </section>
       )}
 
-      {/* EXPERIENCE */}
+      {/* EXPERIENCE - Matches experience table */}
       {data.experience?.length > 0 && (
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Work Experience</h2>
+        <section>
+          <h2 style={styles.sectionTitle}>Experience</h2>
           {data.experience.map((exp, i) => (
-            <div key={i} style={styles.item} className="resume-item">
-              <div style={styles.itemHeader}>
-                <span>{exp.company} {exp.city && `| ${exp.city}`}</span>
-                <span>{exp.start_date} — {exp.currentlyWorking ? 'Present' : exp.end_date}</span>
+            <div key={i} className="resume-item">
+              <div style={styles.bold}>{exp.company || ' '} {exp.city && `| ${exp.city}`}</div>
+              <div>{exp.role || ' '}</div>
+              <div style={{fontSize: '13px', color: '#444'}}>
+                {exp.start_date || ''} - {exp.end_date || 'Present'}
               </div>
-              <div style={styles.subText}>{exp.role}</div>
-              <div style={styles.desc} className="description-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
+              <div style={styles.text} dangerouslySetInnerHTML={{ __html: exp.description || ' ' }} />
             </div>
           ))}
         </section>
       )}
 
-      {/* EDUCATION */}
+      {/* EDUCATION - Matches education table */}
       {data.education?.length > 0 && (
-        <section style={styles.section}>
+        <section>
           <h2 style={styles.sectionTitle}>Education</h2>
           {data.education.map((edu, i) => (
-            <div key={i} style={styles.item} className="resume-item">
-              <div style={styles.itemHeader}>
-                <span>{edu.institution} | {edu.city}</span>
-                <span>{edu.start_date} — {edu.end_date}</span>
+            <div key={i} className="resume-item">
+              <div style={styles.bold}>{edu.institution || ' '} {edu.city && `| ${edu.city}`}</div>
+              <div>{edu.degree || ' '}</div>
+              <div style={{fontSize: '13px'}}>
+                {edu.start_date || ''} - {edu.end_date || ''}
               </div>
-              <div style={styles.subText}>{edu.degree}</div>
             </div>
           ))}
         </section>
       )}
 
-      <div style={styles.gridContainer}>
-        {/* SKILLS */}
-        {data.skills?.length > 0 && (
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>Skills</h2>
-            <div>
-              {data.skills.map((s, i) => (
-                <div key={i} style={styles.skillTag}>
-                  <strong>{s.skill_name}</strong> {s.skill_level && `(${s.skill_level})`}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* LANGUAGES */}
-        {data.languages?.length > 0 && (
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>Languages</h2>
-            {data.languages.map((l, i) => (
-              <div key={i} style={{fontSize: '10pt', marginBottom: '3px'}}>
-                <strong>{l.language_name}</strong>: {l.proficiency}
+      {/* TRAINING - Matches training table */}
+      {data.training?.length > 0 && (
+        <section>
+          <h2 style={styles.sectionTitle}>Training</h2>
+          {data.training.map((t, i) => (
+            <div key={i} className="resume-item">
+              <div style={styles.bold}>{t.title || ' '}</div>
+              <div>{t.institution || ' '}</div>
+              <div style={{fontSize: '13px', color: '#444'}}>
+                Completion: {t.completion_date || ''}
               </div>
-            ))}
-          </section>
-        )}
-      </div>
+            </div>
+          ))}
+        </section>
+      )}
 
-      {/* PROJECTS */}
+      {/* PROJECTS - Matches projects table */}
       {data.projects?.length > 0 && (
-        <section style={styles.section}>
+        <section>
           <h2 style={styles.sectionTitle}>Projects</h2>
           {data.projects.map((p, i) => (
-            <div key={i} style={styles.item} className="resume-item">
-              <div style={styles.itemHeader}>
-                <span>{p.title}</span>
-                {p.link && <span style={{fontSize: '9pt', fontWeight: 'normal'}}>{p.link}</span>}
-              </div>
-              <div style={styles.desc} dangerouslySetInnerHTML={{ __html: p.description }} />
+            <div key={i} className="resume-item">
+              <div style={styles.bold}>{p.title || ' '}</div>
+              {p.link && <div style={{fontSize: '12px', color: 'blue'}}>{p.link}</div>}
+              <div style={styles.text} dangerouslySetInnerHTML={{ __html: p.description || ' ' }} />
             </div>
           ))}
         </section>
       )}
 
-      {/* TRAINING & CERTIFICATIONS */}
-      {data.training?.length > 0 && (
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Certifications</h2>
-          {data.training.map((t, i) => (
-            <div key={i} style={{...styles.item, marginBottom: '5px'}} className="resume-item">
-              <div style={styles.itemHeader}>
-                <span>{t.title} - {t.institution}</span>
-                <span style={{fontWeight: 'normal'}}>{t.completion_date}</span>
-              </div>
-            </div>
-          ))}
+      {/* SKILLS - Matches skills table (skill_name) */}
+      {data.skills?.length > 0 && (
+        <section className="resume-item">
+          <h2 style={styles.sectionTitle}>Skills</h2>
+          <div style={styles.skillsContainer}>
+            {data.skills.map((skill, i) => (
+              <span key={i} style={styles.skillItem}>
+                • {skill.skill_name || ' '} {skill.skill_level && `(${skill.skill_level})`}
+              </span>
+            ))}
+          </div>
         </section>
       )}
 
-      {/* HOBBIES */}
+      {/* LANGUAGES - Matches languages table (language_name) */}
+      {data.languages?.length > 0 && (
+        <section className="resume-item">
+          <h2 style={styles.sectionTitle}>Languages</h2>
+          <div style={styles.text}>
+            {data.languages.map((lang, i) => (
+              <span key={i}>
+                {lang.language_name} {lang.proficiency && `(${lang.proficiency})`}
+                {i < data.languages.length - 1 ? ', ' : ''}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* HOBBIES - Matches hobbies table (hobby_name) */}
       {data.hobbies?.length > 0 && (
-        <section style={styles.section}>
+        <section className="resume-item">
           <h2 style={styles.sectionTitle}>Interests</h2>
-          <p style={{fontSize: '10pt'}}>{data.hobbies.map(h => h.hobby_name).join(', ')}</p>
+          <div style={styles.hobbiesContainer}>
+            {data.hobbies.map((h, i) => (
+              <span key={i} style={styles.hobbyItem}>
+                • {h.hobby_name}
+              </span>
+            ))}
+          </div>
         </section>
       )}
     </div>
