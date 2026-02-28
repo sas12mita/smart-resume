@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const templates = [
   { id: "template1", title: "Basic", thumbnail: "/image/basic.jpg", isPremium: false },
@@ -20,23 +21,25 @@ export default function TemplateSelect() {
   };
 
   const checkPayment = async () => {
-        console.log("🔍 Checking payment status before allowing premium template.111..");
+    console.log("🔍 Checking payment status before allowing premium template.111..");
 
     const { token } = getAuthData();
-    
+
     if (!token) {
       setHasPaid(false);
       setIsLoading(false);
       return;
     }
+
     console.log("🔍 Checking payment status before allowing premium template...");
 
     try {
-          console.log("🔍 Checking payment status before allowing premium template...");
+      console.log("🔍 Checking payment status before allowing premium template...");
 
       const res = await axios.get("http://localhost:5000/api/payment/check-premium", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setHasPaid(res.data.hasPaid);
     } catch (err) {
       console.error("Payment check failed:", err);
@@ -52,7 +55,7 @@ export default function TemplateSelect() {
     checkPayment();
   }, []);
 
-  const handleTemplateClick = (template) => {
+  const handleTemplateClick = async (template) => {
     if (!template.isPremium) {
       navigate(`/user/resume/create/${template.title.toLowerCase()}`);
       return;
@@ -61,13 +64,23 @@ export default function TemplateSelect() {
     const { token } = getAuthData();
 
     if (!token) {
-      alert("Please login to access Premium templates");
+      await Swal.fire({
+        icon: "warning",
+        title: "Login required",
+        text: "Please login to access Premium templates",
+      });
+
       navigate("/user/login");
       return;
     }
 
     if (!hasPaid) {
-      alert("This is a premium template. Please purchase to continue.");
+      await Swal.fire({
+        icon: "info",
+        title: "Premium template",
+        text: "This is a premium template. Please purchase to continue.",
+      });
+
       navigate("/user/dashboard/resume/checkout");
       return;
     }
@@ -90,15 +103,24 @@ export default function TemplateSelect() {
 
       <div style={{ padding: 20 }}>
         <h2>Select Resume Template</h2>
+
         <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
           {templates.map((t) => (
-            <div key={t.id} className="template-card" onClick={() => handleTemplateClick(t)}>
+            <div
+              key={t.id}
+              className="template-card"
+              onClick={() => handleTemplateClick(t)}
+            >
               <img src={t.thumbnail} alt={t.title} width="100%" height="auto" />
-              <h4 style={{ textAlign: "center", padding: 10 }}>{t.title} Resume</h4>
-              
+
+              <h4 style={{ textAlign: "center", padding: 10 }}>
+                {t.title} Resume
+              </h4>
+
               {t.isPremium ? (
                 <>
                   <div className="premium-badge">PREMIUM</div>
+
                   {(!currentUser || !hasPaid) && (
                     <div className="overlay">
                       <div>

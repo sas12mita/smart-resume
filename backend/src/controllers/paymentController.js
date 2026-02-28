@@ -52,12 +52,9 @@ export const confirmPayment = async (req, res) => {
     if (paymentIntent.status === "succeeded") {
       // Store in payments table
       await db.query(
-        "INSERT INTO payments (user_id, stripe_payment_intent_id, amount, status) VALUES (?, ?, ?, ?)",
-        [userId, paymentIntent.id, paymentIntent.amount, paymentIntent.status]
+        "INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency) VALUES (?, ?, ?, ?)",
+        [userId, paymentIntent.id, paymentIntent.amount, paymentIntent.currency]
       );
-
-      // Update user as paid
-      await db.query("UPDATE users SET is_paid = 1 WHERE id = ?", [userId]);
 
       return res.json({ success: true });
     } else {
