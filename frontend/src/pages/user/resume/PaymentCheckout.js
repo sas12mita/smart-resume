@@ -38,8 +38,22 @@ function CheckoutForm() {
           },
         }
       );
+      const data = await res.json();
 
-      const { clientSecret } = await res.json();
+      // ✅ SHOW "already purchased" message
+      if (!res.ok) {
+        await Swal.fire({
+          icon: "info",
+          title: "Already purchased",
+          text: data.message || "You have already purchased premium.",
+        });
+
+        setLoading(false);
+        return;
+      }
+
+
+      const { clientSecret } = data;
 
       // 2️⃣ Confirm Card Payment
       const result = await stripe.confirmCardPayment(clientSecret, {

@@ -1,12 +1,12 @@
 import db from "../config/db.js";
 import Stripe from "stripe"; // 1. Import Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const paidPremium = async (req, res) => {
   try {
     console.log("hello testing");
     // Determine the ID (checks for both .id and .userId to be safe)
-    const userId = req.user.id || req.user.userId; 
-    
+    const userId = req.user.id || req.user.userId;
+
     console.log("Database Check - Looking for user_id:", userId);
 
     const [rows] = await db.query(
@@ -27,13 +27,29 @@ export const paidPremium = async (req, res) => {
 
 export const createPaymentIntent = async (req, res) => {
   try {
+    const userId = req.user.id || req.user.userId;
+
+    // ✅ Check if user already paid
+    const [rows] = await db.query(
+      "SELECT id FROM payments WHERE user_id = ? LIMIT 1",
+      [userId]
+    );
+
+    if (rows.length > 0) {
+      return res.status(400).json({
+        message: "You have already purchased premium."
+      });
+    }
+
+    // ✅ Create payment only if not paid before
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 500, // $5 in cents
-      currency: "usd",
+      amount: 500,
+      currency: "aud",
       automatic_payment_methods: { enabled: true },
     });
 
     res.json({ clientSecret: paymentIntent.client_secret });
+
   } catch (error) {
     console.error("Create PaymentIntent error:", error);
     res.status(500).json({ message: error.message });
