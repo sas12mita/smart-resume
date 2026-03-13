@@ -71,6 +71,13 @@ export const confirmPayment = async (req, res) => {
         "INSERT INTO payments (user_id, stripe_payment_intent_id, amount, currency) VALUES (?, ?, ?, ?)",
         [userId, paymentIntent.id, paymentIntent.amount, paymentIntent.currency]
       );
+      await sendEmail({
+        to: userEmail,
+        subject: "Payment Successful",
+        text: `Your payment of ${(paymentIntent.amount / 100).toFixed(2)} ${paymentIntent.currency.toUpperCase()} was successful!`,
+        html: `<p>Your payment of <strong>${(paymentIntent.amount / 100).toFixed(2)} ${paymentIntent.currency.toUpperCase()}</strong> was successful!</p>`,
+      });
+
 
       return res.json({ success: true });
     } else {
